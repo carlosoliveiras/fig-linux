@@ -109,12 +109,19 @@ export default class App {
     // Full flags reference: https://peter.sh/experiments/chromium-command-line-switches/
     const switches = storage.settings.app.commandSwitches;
 
-    if (!switches.length) {
-      return;
-    }
-
     for (const item of switches) {
       app.commandLine.appendSwitch(item.switch, item.value);
+    }
+
+    // Run natively on Wayland when the session offers it and fall back to X11
+    // otherwise. Without the hint the app always goes through XWayland, which
+    // costs a copy per frame and leaves the UI blurry on HiDPI screens because
+    // fractional scaling is not forwarded.
+    // Users can force a backend by adding their own ozone-platform switch.
+    const hasOzoneSwitch = switches.some((item) => item.switch.startsWith("ozone-platform"));
+
+    if (!hasOzoneSwitch) {
+      app.commandLine.appendSwitch("ozone-platform-hint", "auto");
     }
 
     const colorSpace = storage.settings.app.enableColorSpaceSrgb;
