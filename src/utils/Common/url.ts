@@ -16,8 +16,9 @@ export const isFigmaProtocolUrl = (url: string): boolean => {
 export const parseURL = (url: string): URL | undefined => {
   try {
     return new URL(url);
-  } catch (_a) {}
-  return undefined;
+  } catch {
+    return undefined;
+  }
 };
 
 export const normalizeUrl = (url: string): string => {

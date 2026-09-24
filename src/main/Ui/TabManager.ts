@@ -11,8 +11,8 @@ import { Listeners } from "Utils/Main";
 export default class TabManager {
   public mainTab: MainTab;
   public communityTab: CommunityTab | undefined;
-  public hasOpenedNewFileTab: boolean = false;
-  public hasOpenedCommunityTab: boolean = false;
+  public hasOpenedNewFileTab = false;
+  public hasOpenedCommunityTab = false;
 
   public lastFocusedTab: number | undefined;
   private tabs: Map<number, Tab> = new Map();

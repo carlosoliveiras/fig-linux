@@ -433,7 +433,7 @@ export default class ExtensionManager {
     if (
       !FILE_WHITE_LIST.includes(file.name) &&
       (!FILE_EXTENSION_WHITE_LIST.includes(extname(file.name)) ||
-        !/^[\w\/]+(?:.\w+)*\.\w+/.test(file.name))
+        !/^[\w/]+(?:.\w+)*\.\w+/.test(file.name))
     ) {
       throw new Error(`Filename "${file.name}" not allowed`);
     }
@@ -489,7 +489,7 @@ export default class ExtensionManager {
 
     await mkPath(path);
 
-    let lastKnownPluginId: string = "";
+    let lastKnownPluginId = "";
     const saveFilesPromises = [];
     const pluginDirName = basename(path);
 
