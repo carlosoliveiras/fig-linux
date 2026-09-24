@@ -1,3 +1,4 @@
+import "./migrateConfig";
 import App from "./App";
 import Session from "./Session";
 import FontManager from "./Fonts";

@@ -1,12 +1,16 @@
 {
-  "name": "figma-linux",
+  "name": "fig-linux",
+  "productName": "fig-linux",
   "version": "0.11.4",
-  "description": "Figma is the first interface design tool based in the browser, making it easier for teams to create software. Join as in Telegram: https://t.me/figma_linux",
+  "description": "Unofficial Figma desktop app for Linux",
   "main": "main/main.js",
-  "repository": "git@github.com:ChugunovRoman/figma-linux.git",
-  "homepage": "https://github.com/ChugunovRoman/figma-linux",
-  "author": "ChugunovRoman <Zebs-BMK@yandex.ru>",
-  "license": "MIT",
+  "repository": "git@github.com:carlosoliveiras/fig-linux.git",
+  "homepage": "https://github.com/carlosoliveiras/fig-linux",
+  "author": "José Carlos <vxcarlosig@gmail.com>",
+  "contributors": [
+    "Chugunov Roman <Zebs-BMK@yandex.ru>"
+  ],
+  "license": "GPL-2.0-only",
   "dependencies": {
     "adm-zip": "^0.5.10",
     "chokidar": "^3.5.3",
