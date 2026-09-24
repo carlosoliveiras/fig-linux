@@ -6,9 +6,9 @@ import { dialogs } from "Main/Dialogs";
 import { storage } from "Main/Storage";
 import { logger } from "Main/Logger";
 
-import { DEFAULT_THEME, TEST_THEME_ID, DOWNLOAD_ZIP_URI, DOWNLOAD_ZIP_PATH } from "Const";
+import { DEFAULT_THEME, TEST_THEME_ID, DOWNLOAD_ZIP_URI } from "Const";
 import { keysToCamelCase, keysToKebabCase } from "Utils/Common";
-import { mkPath, access, downloadFile } from "Utils/Main";
+import { mkPath, access, fetchBuffer } from "Utils/Main";
 import ThemeValidator from "./ThemeValidator";
 
 export default class ThemeManager {
@@ -18,6 +18,9 @@ export default class ThemeManager {
   private themesDirectory: string;
   private creatorThemeDirectory: string;
   private creatorThemeFileName: string;
+  // Every panel and settings view asks for the themes when it loads; the
+  // repository only needs to be downloaded once per run.
+  private repositorySync: Promise<void>;
 
   constructor(private validator: ThemeValidator) {
     const userData = app.getPath("userData");
@@ -38,7 +41,8 @@ export default class ThemeManager {
       await mkPath(this.themesDirectory);
     }
 
-    await this.syncThemesFromRepository();
+    this.repositorySync ??= this.trySyncThemesFromRepository();
+    await this.repositorySync;
 
     await Promise.all([
       this.loadFromDirectory(this.themes),
@@ -114,10 +118,16 @@ export default class ThemeManager {
     return this.writeThemeFile(filePath, theme);
   }
 
+  // Offline or a bad response must not stop the local themes from loading.
+  private async trySyncThemesFromRepository() {
+    try {
+      await this.syncThemesFromRepository();
+    } catch (error) {
+      logger.error("Cannot sync themes from the repository: ", error);
+    }
+  }
   public async syncThemesFromRepository() {
-    await downloadFile(DOWNLOAD_ZIP_URI, DOWNLOAD_ZIP_PATH);
-
-    const zip = new Azip(DOWNLOAD_ZIP_PATH);
+    const zip = new Azip(await fetchBuffer(DOWNLOAD_ZIP_URI));
 
     for (const entry of zip.getEntries()) {
       if (/\.json/.test(entry.entryName) && !entry.isDirectory) {
@@ -225,7 +235,7 @@ export default class ThemeManager {
   private async syncThemes(_: IpcMainEvent) {
     logger.debug("Sync themes start");
 
-    await this.syncThemesFromRepository();
+    await this.trySyncThemesFromRepository();
     await this.loadFromDirectory(this.themes);
 
     app.emit("syncThemesEnd", [...this.themes.values()]);
