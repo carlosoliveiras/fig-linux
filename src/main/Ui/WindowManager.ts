@@ -308,10 +308,9 @@ export default class WindowManager {
   }
 
   private windowClose(windowId: number) {
-    const window = this.windows.get(windowId);
-
-    window.close();
-
+    this.windows.get(windowId)?.close();
+  }
+  private windowClosed(windowId: number) {
     this.windows.delete(windowId);
 
     if (this.windows.size === 0) {
@@ -704,7 +703,7 @@ export default class WindowManager {
     app.on("openUrlInNewTab", this.openUrlInNewTab.bind(this));
     app.on("openUrlFromCommunity", this.openUrlFromCommunity.bind(this));
     app.on("windowFocus", this.windowFocus.bind(this));
-    app.on("windowClose", this.windowClose.bind(this));
+    app.on("windowClosed", this.windowClosed.bind(this));
     app.on("handlePluginManageAction", this.handlePluginManageAction.bind(this));
     app.on("handlePluginMenuAction", this.handlePluginMenuAction.bind(this));
     app.on("toggleCurrentWindowDevTools", this.toggleCurrentWindowDevTools.bind(this));

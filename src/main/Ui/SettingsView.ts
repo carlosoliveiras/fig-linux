@@ -1,7 +1,7 @@
 import { app, ipcMain, BrowserView, Rectangle, IpcMainEvent } from "electron";
 import { storage } from "Main/Storage";
 import { isDev } from "Utils/Common";
-import { settingsUrlProd, settingsUrlDev, toggleDetachedDevTools } from "Utils/Main";
+import { settingsUrlProd, settingsUrlDev, toggleDetachedDevTools, Listeners } from "Utils/Main";
 import { dialogs } from "Main/Dialogs";
 
 export default class SettingsView {
@@ -10,6 +10,7 @@ export default class SettingsView {
   private chromiumFlagsChanged = false;
 
   public view: BrowserView;
+  private listeners = new Listeners();
 
   constructor() {
     this.view = new BrowserView({
@@ -131,15 +132,25 @@ export default class SettingsView {
     this.loadSettings();
   }
 
-  private registerEvents() {
-    ipcMain.on("changeTheme", this.changeTheme.bind(this));
-    ipcMain.on("frontReady", this.handleFrontReady.bind(this));
+  public destroy() {
+    this.listeners.removeAll();
 
-    app.on("enableColorSpaceSrgbWasChanged", this.enableColorSpaceSrgbChange.bind(this));
-    app.on("chromiumFlagsChanged", this.chromiumFlagsChange.bind(this));
-    app.on("disableThemesChanged", this.disableThemesChange.bind(this));
-    app.on("syncThemesEnd", this.syncThemesEnd.bind(this));
-    app.on("loadCurrentTheme", this.loadCurrentTheme.bind(this));
-    app.on("loadCreatorThemes", this.loadCreatorThemes.bind(this));
+    if (!this.view.webContents.isDestroyed()) {
+      this.view.webContents.close();
+    }
+  }
+
+  private registerEvents() {
+    const on = this.listeners.on.bind(this.listeners);
+
+    on(ipcMain, "changeTheme", this.changeTheme.bind(this));
+    on(ipcMain, "frontReady", this.handleFrontReady.bind(this));
+
+    on(app, "enableColorSpaceSrgbWasChanged", this.enableColorSpaceSrgbChange.bind(this));
+    on(app, "chromiumFlagsChanged", this.chromiumFlagsChange.bind(this));
+    on(app, "disableThemesChanged", this.disableThemesChange.bind(this));
+    on(app, "syncThemesEnd", this.syncThemesEnd.bind(this));
+    on(app, "loadCurrentTheme", this.loadCurrentTheme.bind(this));
+    on(app, "loadCreatorThemes", this.loadCreatorThemes.bind(this));
   }
 }
