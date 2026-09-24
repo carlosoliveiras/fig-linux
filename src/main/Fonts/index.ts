@@ -29,7 +29,7 @@ export default class FontManager {
       try {
         const ttf = new TTF(await readFile(path));
 
-        this.fontList[path] = [ttf.getData()];
+        this.fontList[path] = ttf.getData();
       } catch (error) {
         logger.warn(`skip font: ${path}, error: `, error.message);
       }
