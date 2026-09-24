@@ -1,4 +1,4 @@
-import { writeFile } from "fs/promises";
+import { createWriteStream, writeFileSync, WriteStream } from "fs";
 import { join } from "path";
 import { app } from "electron";
 
@@ -7,12 +7,19 @@ import { Logger } from "./Logger";
 
 export class FileLogger extends Logger {
   private logFilePath: string;
+  // One append stream: opening the file for every line cost a syscall round
+  // trip each time, and concurrent appends could land out of order.
+  private stream: WriteStream;
 
   constructor() {
     super();
 
     this.logFilePath = join(app.getPath("userData"), "logfile.log");
     this.truncFile();
+    this.stream = createWriteStream(this.logFilePath, { flags: "a" });
+    this.stream.on("error", (error) => {
+      console.error(`Cannot write log to file: ${this.logFilePath}, error: `, error);
+    });
   }
 
   private truncFile() {
@@ -26,9 +33,11 @@ export class FileLogger extends Logger {
     const cmprTimestamp = storage.settings.app.lastTimeClearLogFile + 8.64e7;
 
     if (cmprTimestamp <= currentTimestamp) {
-      writeFile(this.logFilePath, "", { flag: "w" }).catch((error) => {
-        this.error(`Cannot write log to file: ${this.logFilePath}, error: `, error);
-      });
+      try {
+        writeFileSync(this.logFilePath, "");
+      } catch (error) {
+        console.error(`Cannot clear log file: ${this.logFilePath}, error: `, error);
+      }
 
       storage.settings.app.lastTimeClearLogFile = currentTimestamp;
       storage.save();
@@ -36,8 +45,6 @@ export class FileLogger extends Logger {
   }
 
   public log = (msg: string) => {
-    writeFile(this.logFilePath, `${msg}\n`, { flag: "a" }).catch((error) => {
-      this.error(`Cannot write log to file: ${this.logFilePath}, error: `, error);
-    });
+    this.stream.write(`${msg}\n`);
   };
 }

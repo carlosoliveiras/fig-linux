@@ -7,7 +7,6 @@ import { logger } from "Main/Logger";
 type MICO = MenuItemConstructorOptions;
 
 export default class MenuManager {
-  private menu: Menu;
   private _menu: Map<number, Menu.State> = new Map();
 
   constructor() {}
@@ -61,13 +60,16 @@ export default class MenuManager {
 
     template.push(this.item("Quit", "quitApp", "Ctrl+Alt+Q"));
 
-    this.menu = Menu.buildFromTemplate(template);
-
-    return this.menu;
+    return Menu.buildFromTemplate(template);
   }
 
-  public openMainMenuHandler(width: number, window: BrowserWindow, callback?: () => void) {
-    this.menu.popup({
+  public openMainMenuHandler(
+    width: number,
+    window: BrowserWindow,
+    menu: Menu,
+    callback?: () => void,
+  ) {
+    menu.popup({
       callback,
       window,
       x: width - MENU_WIDTH,

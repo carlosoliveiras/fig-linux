@@ -368,9 +368,14 @@ export default class WindowManager {
       };
     }
 
-    const menu = this.menuManager.getMenu(state);
+    // Figma sends updateFullscreenMenuState on every UI change; rebuilding the
+    // whole menu is only needed when its content changed.
+    const stateKey = JSON.stringify(state);
+    if (window.menuStateKey === stateKey) {
+      return;
+    }
 
-    window.setMenu(menu);
+    window.setMenu(this.menuManager.getMenu(state), stateKey);
   }
   private newProject(_: IpcMainEvent) {
     const window = this.windows.get(this.lastFocusedwindowId);
@@ -617,6 +622,7 @@ export default class WindowManager {
     this.menuManager.openMainMenuHandler(
       width,
       window.win,
+      window.menu,
       window.openMainMenuCloseHandler.bind(window),
     );
   }

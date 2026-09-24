@@ -394,7 +394,13 @@ export default class Window {
 
     this.setFocusToMainTab();
   }
-  public setMenu(menu: Menu) {
+  // Each window keeps its own menu; the main menu popup used to show whichever
+  // window's menu was built last.
+  public menu: Menu;
+  public menuStateKey: string;
+  public setMenu(menu: Menu, stateKey?: string) {
+    this.menu = menu;
+    this.menuStateKey = stateKey;
     this.window.setMenu(menu);
   }
   public closeNewFileTab() {
@@ -626,7 +632,6 @@ export default class Window {
     this.window.on("resize", this.updateTabsBounds.bind(this));
     this.window.on("maximize", () => setTimeout(this.updateTabsBounds.bind(this), 100));
     this.window.on("unmaximize", () => setTimeout(this.updateTabsBounds.bind(this), 100));
-    this.window.on("move", () => setTimeout(this.updateTabsBounds.bind(this), 100));
     this.window.on("focus", () => app.emit("windowFocus", this.window.id));
     this.window.on("enter-full-screen", this.onEnterFullScreen.bind(this));
     this.window.on("leave-full-screen", this.onLeaveFullScreen.bind(this));
