@@ -10,12 +10,6 @@ export class AppLogger extends Logger {
   }
 
   private initLoggerEvent = (): void => {
-    ipcMain.on("logDebug", (sender, ...msg) =>
-      this.debug(`[From web content: ${sender.sender.id}]`, ...msg),
-    );
-    ipcMain.on("logInfo", (sender, ...msg) =>
-      this.info(`[From web content: ${sender.sender.id}]`, ...msg),
-    );
     ipcMain.on("logWarn", (sender, ...msg) =>
       this.warn(`[From web content: ${sender.sender.id}]`, ...msg),
     );

@@ -110,7 +110,6 @@ export default class Tab {
 
     if (from.pathname === "/login") {
       // TODO:
-      // this.tabManager.reloadAll();
 
       event.preventDefault();
       return;

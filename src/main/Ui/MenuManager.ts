@@ -52,15 +52,6 @@ export default class MenuManager {
     }
 
     // TODO: will complete this when the Figma develop's team will complete the desktop API for widgets
-    // if (state?.widgetMenuData?.length > 0) {
-    //   template.push({
-    //     label: "Widgets",
-    //     submenu: this.parseFigmaMenu(state.widgetMenuData),
-    //   });
-    // } else {
-    //   template.push(this.widgetsMenu());
-    // }
-
     template.push({ type: "separator" });
 
     template.push(this.item("Settings", "openSettingsView"));
@@ -299,19 +290,6 @@ export default class MenuManager {
           label: "Manage plugins...",
           click() {
             app.emit("handlePluginManageAction");
-          },
-        },
-      ],
-    };
-  }
-  private widgetsMenu(): MenuItemConstructorOptions {
-    return {
-      label: "Widgets",
-      submenu: [
-        {
-          label: "Manage widgets...",
-          click() {
-            app.emit("handleWidgetManageAction");
           },
         },
       ],

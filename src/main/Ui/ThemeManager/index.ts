@@ -225,8 +225,6 @@ export default class ThemeManager {
   private async syncThemes(_: IpcMainEvent) {
     logger.debug("Sync themes start");
 
-    app.emit("syncThemesStart");
-
     await this.syncThemesFromRepository();
     await this.loadFromDirectory(this.themes);
 

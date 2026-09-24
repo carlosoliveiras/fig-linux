@@ -42,14 +42,11 @@ declare namespace Electron {
       listener: (windowId: number, pluginMenuAction: Menu.MenuAction) => void,
     ): this;
     on(event: "handlePluginManageAction", listener: () => void): this;
-    on(event: "handleWidgetManageAction", listener: () => void): this;
-    on(event: "handleUrl", listener: (url: string) => void): this;
     on(event: "openUrlInNewTab", listener: (url: string) => void): this;
     on(event: "openUrlFromCommunity", listener: (url: string) => void): this;
     on(event: "openSettingsView", listener: () => void): this;
     on(event: "windowClose", listener: (windowId: number) => void): this;
     on(event: "windowFocus", listener: (windowId: number) => void): this;
-    on(event: "syncThemesStart", listener: () => void): this;
     on(event: "syncThemesEnd", listener: (themes: Themes.Theme[]) => void): this;
     on(event: "loadCreatorTheme", listener: (themes: Themes.Theme) => void): this;
     on(event: "loadCurrentTheme", listener: (themes: Themes.Theme) => void): this;
@@ -105,14 +102,11 @@ declare namespace Electron {
       pluginMenuAction: Menu.MenuAction,
     ): boolean;
     emit(event: "handlePluginManageAction"): boolean;
-    emit(event: "handleWidgetManageAction"): boolean;
-    emit(event: "handleUrl", url: string): boolean;
     emit(event: "openUrlInNewTab", url: string): boolean;
     emit(event: "openUrlFromCommunity", url: string): boolean;
     emit(event: "openSettingsView"): boolean;
     emit(event: "windowClose", windowId: number): void;
     emit(event: "windowFocus", windowId: number): void;
-    emit(event: "syncThemesStart"): void;
     emit(event: "syncThemesEnd", themes: Themes.Theme[]): void;
     emit(event: "loadCreatorTheme", themes: Themes.Theme): void;
     emit(event: "loadCurrentTheme", themes: Themes.Theme): void;
@@ -209,8 +203,6 @@ declare namespace Electron {
       channel: "setFeatureFlags",
       listener: (event: IpcMainInvokeEvent, data: { featureFlags: Types.FeatureFlags }) => void,
     ): this;
-    on(channel: "logDebug", listener: (event: IpcMainInvokeEvent, ...args: any[]) => void): this;
-    on(channel: "logInfo", listener: (event: IpcMainInvokeEvent, ...args: any[]) => void): this;
     on(channel: "logError", listener: (event: IpcMainInvokeEvent, ...args: any[]) => void): this;
     on(
       channel: "openDevTools",
@@ -396,7 +388,6 @@ declare namespace Electron {
       channel: "loadCreatorThemes",
       listener: (event: IpcRendererEvent, themes: Themes.Theme[]) => void,
     ): this;
-    on(channel: "syncThemesStart", listener: (event: IpcRendererEvent) => void): this;
     on(channel: "syncThemesEnd", listener: (event: IpcRendererEvent) => void): this;
     on(channel: "windowDidMaximized", listener: (event: IpcRendererEvent) => void): this;
     on(channel: "windowDidRestored", listener: (event: IpcRendererEvent) => void): this;
@@ -442,8 +433,6 @@ declare namespace Electron {
     send(channel: "themeCreatorRemoveTheme", themeId: string): this;
     send(channel: "enabled", enabled: boolean): this;
     send(channel: "updateFigmaUiScale", scale: number): this;
-    send(channel: "logDebug", ...args: any[]): this;
-    send(channel: "logInfo", ...args: any[]): this;
     send(channel: "logError", ...args: any[]): this;
     send(channel: "removeLocalFileExtension", id: number): this;
     send(channel: "openExtensionDirectory", id: number): this;
@@ -522,7 +511,6 @@ declare namespace Electron {
     send(channel: "loadCreatorTheme", theme: Themes.Theme): this;
     send(channel: "loadCurrentTheme", theme: Themes.Theme): this;
     send(channel: "loadCreatorThemes", themes: Themes.Theme[]): this;
-    send(channel: "syncThemesStart", theme: Themes.Theme): this;
     send(channel: "syncThemesEnd", theme: Themes.Theme): this;
     send(channel: "isMainMenuOpen", isOpen: boolean): this;
     send(channel: "communityTabWasClose", isOpen: boolean): this;

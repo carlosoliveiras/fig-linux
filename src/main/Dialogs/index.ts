@@ -53,15 +53,9 @@ export class Provider {
   public showOpenDialog = (params?: Dialogs.OpenOptions): Promise<string[] | null> => {
     return this.provider.showOpenDialog(params);
   };
-  public showOpenDialogSync = (params?: Dialogs.OpenOptions): string[] | null => {
-    return this.provider.showOpenDialogSync(params);
-  };
 
   public showSaveDialog = (params: Dialogs.SaveOptions): Promise<string | null> => {
     return this.provider.showSaveDialog(params);
-  };
-  public showSaveDialogSync = (params: Dialogs.SaveOptions): string | null => {
-    return this.provider.showSaveDialogSync(params);
   };
 }
 

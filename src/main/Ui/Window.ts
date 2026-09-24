@@ -269,9 +269,6 @@ export default class Window {
       this.window.webContents.send("isMainMenuOpen", false);
     }, 150);
   }
-  public hasWebContentId(webContentsId: number) {
-    return this.tabManager.getAll().has(webContentsId);
-  }
 
   public getTabInfo(tabId: number) {
     const tab = this.tabManager.getById(tabId);
