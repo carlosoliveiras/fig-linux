@@ -529,6 +529,11 @@ export default class WindowManager {
     storage.settings = settings;
     storage.save();
 
+    // Panels read their settings (tab scale, new project button) from loadSettings.
+    for (const [_, win] of this.windows) {
+      win.sendSettingsToPanel();
+    }
+
     window.closeSettingsView();
   }
   private handleUrl(path: string) {
@@ -604,11 +609,6 @@ export default class WindowManager {
     const window = this.getWindowByWebContentsId(event.sender.id);
 
     window.openCommunity(args);
-  }
-  private updateVisibleNewProjectBtn(event: IpcMainEvent, visible: boolean) {
-    const window = this.getWindowByWebContentsId(event.sender.id);
-
-    window.updateVisibleNewProjectBtn(event, visible);
   }
 
   private changeTheme(event: IpcMainEvent, theme: Themes.Theme) {
@@ -691,7 +691,6 @@ export default class WindowManager {
     ipcMain.on("changeTheme", this.changeTheme.bind(this));
     ipcMain.on("openFile", this.openFile.bind(this));
     ipcMain.on("openCommunity", this.openCommunity.bind(this));
-    ipcMain.on("updateVisibleNewProjectBtn", this.updateVisibleNewProjectBtn.bind(this));
     ipcMain.on("frontReady", this.handleFrontReady.bind(this));
     ipcMain.on("updateFullscreenMenuState", this.updateFullscreenMenuState.bind(this));
     ipcMain.on("windowMinimize", this.windowMinimize.bind(this));

@@ -217,10 +217,6 @@ declare namespace Electron {
     on(channel: "newProject", listener: (event: IpcMainInvokeEvent) => void): this;
     on(channel: "closeCommunityTab", listener: (event: IpcMainInvokeEvent) => void): this;
     on(
-      channel: "updateVisibleNewProjectBtn",
-      listener: (event: IpcMainInvokeEvent, visible: boolean) => void,
-    ): this;
-    on(
       channel: "updateFullscreenMenuState",
       listener: (event: IpcMainInvokeEvent, state: Menu.State) => void,
     ): this;
@@ -327,10 +323,6 @@ declare namespace Electron {
 
   interface IpcRenderer extends NodeJS.EventEmitter {
     on(
-      channel: "updateVisibleNewProjectBtn",
-      listener: (event: IpcRendererEvent, visible: boolean) => void,
-    ): this;
-    on(
       channel: "setPanelScale",
       listener: (event: IpcRendererEvent, scale: number, height: number) => void,
     ): this;
@@ -424,7 +416,6 @@ declare namespace Electron {
     send(channel: "openTabMenu", tabId: number): this;
     send(channel: "newProject"): this;
     send(channel: "closeCommunityTab"): this;
-    send(channel: "updateVisibleNewProjectBtn", visible: boolean): this;
     send(channel: "updateFullscreenMenuState", state: Menu.State): this;
     send(channel: "saveCreatorTheme", theme: Themes.Theme): this;
     send(channel: "syncThemes"): this;
@@ -474,7 +465,6 @@ declare namespace Electron {
   interface WebContents extends NodeJS.EventEmitter {
     send(channel: "themesLoaded", themes: Themes.Theme[]): void;
     send(channel: "toggleThemeCreatorPreviewMask"): void;
-    send(channel: "updateVisibleNewProjectBtn", visible: boolean): void;
     send(channel: "setPanelScale", scale: number, height: number): void;
     send(channel: "closeAllTab"): void;
     send(channel: "setTitle", data: { id: number; title: string }): void;

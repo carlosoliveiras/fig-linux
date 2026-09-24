@@ -8,6 +8,7 @@ import {
   panelZoom,
   newFileVisible,
   communityTabVisible,
+  newProjectBtnEnabled,
 } from "./store";
 
 export function initIpc() {
@@ -65,6 +66,7 @@ export function initIpc() {
   });
   ipcRenderer.on("loadSettings", (_, settings: Types.SettingsInterface) => {
     panelZoom.set(settings.ui.scalePanel);
+    newProjectBtnEnabled.set(settings.app.visibleNewProjectBtn);
   });
   ipcRenderer.on("openCommunity", (_) => {
     communityTabVisible.set(true);

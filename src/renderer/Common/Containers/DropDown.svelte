@@ -40,9 +40,14 @@
     }
   }
 
-  onMount(calcHeight);
+  // Content can grow after mount (e.g. themes arriving after a sync); measuring
+  // only on mount, window resize and toggle clipped it until the next toggle.
+  onMount(() => {
+    const observer = new ResizeObserver(calcHeight);
 
-  window.addEventListener("resize", calcHeight);
+    observer.observe(content);
+    return () => observer.disconnect();
+  });
 </script>
 
 <div>

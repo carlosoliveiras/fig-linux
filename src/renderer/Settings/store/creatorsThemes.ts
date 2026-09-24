@@ -7,7 +7,9 @@ function createCreatorsThemes() {
     subscribe,
     update,
     set,
-    exists: (name: string) => !!get(creatorsThemes).find((theme) => theme.name === name),
+    // `exceptId`: the theme being edited may keep its own name.
+    exists: (name: string, exceptId?: string) =>
+      get(creatorsThemes).some((theme) => theme.name === name && theme.id !== exceptId),
   };
 }
 

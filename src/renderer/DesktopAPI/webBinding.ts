@@ -33,7 +33,8 @@ const onWebMessage = (event: MessageEvent) => {
     mainProcessCancelCallbacks.delete(msg.cancelCallbackID);
     return;
   }
-  if (!msg.name || !(msg.name in publicAPI)) {
+  // Own methods only: `in` also matched inherited names like "constructor" or "toString".
+  if (!msg.name || !Object.hasOwn(publicAPI, msg.name)) {
     sendMsgToMain("logWarn", "[desktop] Unhandled message", msg.name);
     return;
   }
@@ -41,7 +42,7 @@ const onWebMessage = (event: MessageEvent) => {
   let resultPromise = undefined;
 
   try {
-    resultPromise = msg.name && publicAPI && publicAPI[msg.name](msg.args);
+    resultPromise = publicAPI[msg.name](msg.args);
   } catch (e) {
     console.error("onWebMessage, err: ", msg.name, e);
     throw e;
