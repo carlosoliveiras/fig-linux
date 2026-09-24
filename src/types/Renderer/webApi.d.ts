@@ -67,15 +67,6 @@ declare namespace WebApi {
     data: Uint8Array;
   }
 
-  interface GetFonts {
-    useAgent: boolean;
-  }
-
-  interface GetFontFile {
-    path: string;
-    postscript: string;
-  }
-
   interface SetUsingMic {
     isUsingMicrophone: boolean;
   }
