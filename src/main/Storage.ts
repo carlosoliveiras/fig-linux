@@ -2,7 +2,7 @@ import { app, ipcMain, IpcMainEvent } from "electron";
 import * as path from "path";
 import * as fs from "fs";
 
-import { DEFAULT_SETTINGS, accessSync } from "Utils/Main";
+import { DEFAULT_SETTINGS } from "Utils/Main";
 
 /**
  * This class has dual initialization: in main process and renderer process
@@ -20,28 +20,18 @@ export class Storage {
   }
 
   private load = (): void => {
-    const exist = accessSync(this.filePath);
-
-    if (!exist) {
-      const mergedSettings = {
-        ...DEFAULT_SETTINGS,
-        ...this.settings,
-      };
-
-      this.settings = mergedSettings;
-      this.writeSync(mergedSettings);
-
-      return;
-    }
-
-    this.settings = this.readSync();
+    const saved: Partial<Types.SettingsInterface> = fs.existsSync(this.filePath)
+      ? this.readSync()
+      : {};
+    // A copy: the live settings used to share nested objects with the defaults.
+    const defaults = structuredClone(DEFAULT_SETTINGS);
 
     this.settings = {
-      ...DEFAULT_SETTINGS,
-      ...this.settings,
+      ...defaults,
+      ...saved,
       app: {
-        ...DEFAULT_SETTINGS.app,
-        ...this.settings.app,
+        ...defaults.app,
+        ...saved.app,
       },
     };
 

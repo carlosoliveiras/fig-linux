@@ -132,12 +132,9 @@ export default class App {
     }
   }
   private setAuthedUsers(_: IpcMainEvent, userIds: string[]) {
-    if (!Array.isArray(storage.settings.authedUserIDs)) {
-      storage.settings.authedUserIDs = userIds;
-      storage.save();
-    }
-
-    storage.settings.authedUserIDs = [...new Set([...storage.settings.authedUserIDs, ...userIds])];
+    storage.settings.authedUserIDs = [
+      ...new Set([...(storage.settings.authedUserIDs ?? []), ...userIds]),
+    ];
   }
   private setWorkspaceName(_: IpcMainEvent, name: string) {
     logger.warn("The setWorkspaceName not implemented, workspaceName: ", name);
