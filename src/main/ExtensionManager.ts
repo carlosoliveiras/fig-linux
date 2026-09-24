@@ -88,30 +88,25 @@ export default class ExtensionManager {
   public addCodeObserver(callback: ObserverCallback, reg: RegExp): void {
     this.codeObservers.push(callback);
 
-    if (this.codeObservers.length <= 2) {
-      this.extensionMap.forEach((entry, id) => {
-        if (entry.observeFiles.size > 0) {
-          for (const file of entry.observeFiles) {
-            if (file[0] === MANIFEST_FILE_NAME) {
-              continue;
-            }
-            if (!reg.test(file[0])) {
-              continue;
-            }
-
-            const filepath = resolve(entry.path, file[0]);
-            const watcher = Chokidar.watch(filepath, undefined);
-
-            watcher.on("all", () => this.codeWatcher(id));
-            watcher.on("error", (error) =>
-              logger.error(`chokidar error for ${filepath}: ${error.name}: ${error.message}`),
-            );
-
-            entry.observeFiles.set(file[0], watcher);
-          }
+    // One watcher per file, shared by every observer. Creating a new one on
+    // each registration leaked the previous watcher and doubled notifications.
+    this.extensionMap.forEach((entry, id) => {
+      for (const file of entry.observeFiles) {
+        if (file[0] === MANIFEST_FILE_NAME || file[1] || !reg.test(file[0])) {
+          continue;
         }
-      });
-    }
+
+        const filepath = resolve(entry.path, file[0]);
+        const watcher = Chokidar.watch(filepath, undefined);
+
+        watcher.on("all", () => this.codeWatcher(id));
+        watcher.on("error", (error) =>
+          logger.error(`chokidar error for ${filepath}: ${error.name}: ${error.message}`),
+        );
+
+        entry.observeFiles.set(file[0], watcher);
+      }
+    });
   }
   public removeCodeObserver(callback: ObserverCallback): void {
     const index = this.codeObservers.indexOf(callback);
@@ -632,44 +627,57 @@ export default class ExtensionManager {
     return Array.from(this.extensionMap.keys());
   }
 
-  private registerManifestChangeObserver(event: IpcMainEvent, callbackID: number, args?: any) {
+  // Figma cancels its observers with web-cancel-callback, but a closed tab never
+  // does, so the observer (and its file watchers) is also dropped with the tab.
+  private registerObserver(
+    event: IpcMainEvent,
+    callbackID: number,
+    add: (observer: ObserverCallback) => void,
+    remove: (observer: ObserverCallback) => void,
+  ) {
+    const sender = event.sender;
+    const key = `${callbackID}:${sender.id}`;
     const observer = (args: any) => {
-      app.emit("handleCallbackForTab", event.sender.id, callbackID, args);
+      app.emit("handleCallbackForTab", sender.id, callbackID, args);
     };
     const cancel = () => {
-      this.removeManifestObserver(observer);
+      sender.removeListener("destroyed", cancel);
+      this.registeredCancelCallbackMap.delete(key);
+      remove(observer);
     };
 
-    this.addManifestObserver(observer);
-    this.registeredCancelCallbackMap.set(`${callbackID}:${event.sender.id}`, cancel);
+    add(observer);
+    this.registeredCancelCallbackMap.set(key, cancel);
+    sender.once("destroyed", cancel);
   }
-  private registerCodeChangeObserver(event: IpcMainEvent, callbackID: number, args?: any) {
-    const observer = (args: any) => {
-      app.emit("handleCallbackForTab", event.sender.id, callbackID, args);
-    };
-    const cancel = () => {
-      this.removeCodeObserver(observer);
-    };
-
-    this.addCodeObserver(observer, ALLOW_CODE_FILES);
-    this.registeredCancelCallbackMap.set(`${callbackID}:${event.sender.id}`, cancel);
+  private registerManifestChangeObserver(event: IpcMainEvent, callbackID: number) {
+    this.registerObserver(
+      event,
+      callbackID,
+      (observer) => this.addManifestObserver(observer),
+      (observer) => this.removeManifestObserver(observer),
+    );
   }
-  private registerUiChangeObserver(event: IpcMainEvent, callbackID: number, args?: any) {
-    const observer = (args: any) => {
-      app.emit("handleCallbackForTab", event.sender.id, callbackID, args);
-    };
-    const cancel = () => {
-      this.removeCodeObserver(observer);
-    };
-
-    this.addCodeObserver(observer, ALLOW_UI_FILES);
-    this.registeredCancelCallbackMap.set(`${callbackID}:${event.sender.id}`, cancel);
+  private registerCodeChangeObserver(event: IpcMainEvent, callbackID: number) {
+    this.registerObserver(
+      event,
+      callbackID,
+      (observer) => this.addCodeObserver(observer, ALLOW_CODE_FILES),
+      (observer) => this.removeCodeObserver(observer),
+    );
+  }
+  private registerUiChangeObserver(event: IpcMainEvent, callbackID: number) {
+    this.registerObserver(
+      event,
+      callbackID,
+      (observer) => this.addCodeObserver(observer, ALLOW_UI_FILES),
+      (observer) => this.removeCodeObserver(observer),
+    );
   }
   private webCancelCallback(event: IpcMainEvent, callbackID: number) {
     const key = `${callbackID}:${event.sender.id}`;
 
     this.registeredCancelCallbackMap.get(key)?.();
-    this.registeredCancelCallbackMap.delete(key);
   }
 
   private registerEvents() {

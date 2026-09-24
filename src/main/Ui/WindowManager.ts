@@ -626,9 +626,8 @@ export default class WindowManager {
     window.openSettingsView();
   }
   private handleCallbackForTab(webContentsId: number, cbId: number, args: any) {
-    const window = this.getWindowByWebContentsId(webContentsId);
-
-    window.handleCallbackForTab(webContentsId, cbId, args);
+    // The tab may have closed since the observer was registered.
+    this.getWindowByWebContentsId(webContentsId)?.handleCallbackForTab(webContentsId, cbId, args);
   }
   private windowMinimize(event: IpcMainEvent) {
     const window = this.getWindowByWebContentsId(event.sender.id);
