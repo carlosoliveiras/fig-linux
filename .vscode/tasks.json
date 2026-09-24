@@ -41,12 +41,12 @@
     {
       "label": "Replace installed version",
       "type": "shell",
-      "command": "cp -rf ./build/linux-unpacked/* /opt/figma-linux/"
+      "command": "cp -rf ./build/linux-unpacked/* /opt/fig-linux/"
     },
     {
       "label": "Copy settings",
       "type": "shell",
-      "command": "rm -rf ~/.config/Electron && cp -rf ~/.config/figma-linux ~/.config/Electron"
+      "command": "rm -rf ~/.config/Electron && cp -rf ~/.config/fig-linux ~/.config/Electron"
     }
   ]
 }

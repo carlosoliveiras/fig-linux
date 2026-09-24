@@ -1,12 +1,16 @@
 {
-  "name": "figma-linux",
+  "name": "fig-linux",
+  "productName": "fig-linux",
   "version": "0.11.4",
-  "description": "Figma is the first interface design tool based in the browser, making it easier for teams to create software. Join as in Telegram: https://t.me/figma_linux",
+  "description": "Unofficial Figma desktop app for Linux",
   "main": "src/main/index.ts",
-  "repository": "git@github.com:ChugunovRoman/figma-linux.git",
-  "homepage": "https://github.com/ChugunovRoman/figma-linux",
-  "author": "ChugunovRoman <Zebs-BMK@yandex.ru>",
-  "license": "MIT",
+  "repository": "git@github.com:carlosoliveiras/fig-linux.git",
+  "homepage": "https://github.com/carlosoliveiras/fig-linux",
+  "author": "José Carlos <vxcarlosig@gmail.com>",
+  "contributors": [
+    "Chugunov Roman <Zebs-BMK@yandex.ru>"
+  ],
+  "license": "GPL-2.0-only",
   "scripts": {
     "start": "run-s build run",
     "dev": "run-s rollup:dev",
@@ -20,7 +24,7 @@
     "builder": "electron-builder --config=config/builder.json -l",
     "pack": "rm -rf build/installers && npm run build && chmod a+x ./resources/AppRun && npm run builder",
     "package": "rm -rf build/installers && npm run build && electron-builder --config=config/builder.json -l",
-    "local:install": "sudo rm -rf /opt/figma-linux && sudo mkdir -p /opt/figma-linux && sudo cp -rf ./build/installers/linux-unpacked/* /opt/figma-linux/",
+    "local:install": "sudo rm -rf /opt/fig-linux && sudo mkdir -p /opt/fig-linux && sudo cp -rf ./build/installers/linux-unpacked/* /opt/fig-linux/",
     "check": "svelte-check",
     "lp": "run-p lint prettier",
     "lint": "eslint -c ./config/.eslintrc.js src/**/*.ts",

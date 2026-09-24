@@ -18,12 +18,12 @@ export default (): { figmaUrl: string } => {
 
   if (argv.indexOf("-h") != -1) {
     const help = `
-figma-linux
+fig-linux
 
 Unofficial desktop application for linux. This application based on the Electron.js.
 
 use:
-    figma-linux [options] [APP_URL_TO_PROJECT]
+    fig-linux [options] [APP_URL_TO_PROJECT]
 
     OPTIONS:
         -h      this reference.

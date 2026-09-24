@@ -389,7 +389,7 @@ export default class Window {
   private webContentDidFinishLoad() {
     if (this.state.hasOpenedCommunityTab) {
       this.openCommunity({
-        path: "/@figma_linux",
+        path: "/community",
         userId: this._userId,
       });
     }
