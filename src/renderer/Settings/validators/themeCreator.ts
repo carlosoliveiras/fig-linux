@@ -1,4 +1,5 @@
-import { creatorsThemes, themeNameError, themeAuthorError } from "../store";
+import { get } from "svelte/store";
+import { creatorsThemes, creatorTheme, themeNameError, themeAuthorError } from "../store";
 
 export function validateThemeName(name: string): boolean {
   if (name === "Default Theme") {
@@ -10,7 +11,10 @@ export function validateThemeName(name: string): boolean {
     return false;
   }
 
-  const exists = creatorsThemes.exists(name);
+  // Saving an edited theme under its own name overwrites it; that used to be
+  // rejected as "already exists", so Save never worked.
+  const { state, theme } = get(creatorTheme);
+  const exists = creatorsThemes.exists(name, state === "edit" ? theme.id : undefined);
 
   if (exists) {
     themeNameError.set("Theme already exists. Please, choose other name");

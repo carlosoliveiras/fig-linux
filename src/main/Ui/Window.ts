@@ -591,9 +591,6 @@ export default class Window {
 
     this.setFocusToCommunityTab();
   }
-  public updateVisibleNewProjectBtn(_: IpcMainEvent, visible: boolean) {
-    this.window.webContents.send("updateVisibleNewProjectBtn", visible);
-  }
   public handleCallbackForTab(webContentsId: number, cbId: number, args: any) {
     this.tabManager.handleCallbackForTab(webContentsId, cbId, args);
   }
@@ -605,8 +602,11 @@ export default class Window {
   }
 
   public handleFrontReady() {
-    this.window.webContents.send("loadSettings", storage.settings);
+    this.sendSettingsToPanel();
     this.showHandler(null);
+  }
+  public sendSettingsToPanel() {
+    this.window.webContents.send("loadSettings", storage.settings);
   }
 
   public close() {
