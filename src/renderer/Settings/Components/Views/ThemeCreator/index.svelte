@@ -45,8 +45,18 @@
 
   let webviews: any[] = [];
 
+  const sendTheme = (webview: any, store: typeof $creatorTheme) => {
+    webview.send("getThemeCreatorPalette", store.theme.palette);
+    webview.send("changeZoomFactor", store.zoom);
+  };
+
   onMount(() => {
-    webviews.forEach((webview, index) => {
+    // Previews whose page is loaded. One subscription feeds them all; it used to
+    // subscribe again on every dom-ready (each navigation of each preview) and
+    // never unsubscribe.
+    const ready = new Set<any>();
+
+    webviews.forEach((webview) => {
       webview.addEventListener("dom-ready", () => {
         if (previewer) {
           const width = previewer.getBoundingClientRect().width;
@@ -58,18 +68,13 @@
         }
 
         setTimeout(() => {
-          webview.send("getThemeCreatorPalette", $creatorTheme.theme.palette);
-
-          creatorTheme.subscribe((store) => {
-            if (webviews.length === 0 || !webviews[index]) {
-              return;
-            }
-            webview.send("getThemeCreatorPalette", store.theme.palette);
-            webview.send("changeZoomFactor", store.zoom);
-          });
+          ready.add(webview);
+          sendTheme(webview, $creatorTheme);
         }, 1000);
       });
     });
+
+    return creatorTheme.subscribe((store) => ready.forEach((webview) => sendTheme(webview, store)));
   });
 
   $: isValidName = $themeNameError === "";
