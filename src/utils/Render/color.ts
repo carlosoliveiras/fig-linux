@@ -25,16 +25,3 @@ export const HexToRgb = (hex: string) => {
 
   return `rgb(${r}, ${g}, ${b})`;
 };
-export const RgbToHex = (rgb: string) => {
-  if (!isRgb(rgb)) {
-    return rgb;
-  }
-
-  const [_, r, g, b] = rgb.match(rgbReg);
-
-  const red = (+r).toString(16).padStart(2, "0");
-  const green = (+g).toString(16).padStart(2, "0");
-  const blue = (+b).toString(16).padStart(2, "0");
-
-  return `#${red}${green}${blue}`;
-};
