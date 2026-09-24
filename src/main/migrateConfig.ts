@@ -1,5 +1,5 @@
 import { app } from "electron";
-import { cpSync, existsSync, renameSync, rmSync } from "fs";
+import { copyFileSync, cpSync, existsSync } from "fs";
 import { basename, join } from "path";
 
 // The app used to be called figma-linux, so settings, session and themes of
@@ -8,18 +8,19 @@ import { basename, join } from "path";
 // Must run before anything else reads app.getPath("userData").
 const oldDir = join(app.getPath("appData"), "figma-linux");
 const newDir = app.getPath("userData");
+const SETTINGS = "settings.json";
 
-if (!existsSync(newDir) && existsSync(oldDir)) {
-  const tmpDir = `${newDir}.migrating`;
-
+// Electron creates userData (Crashpad) before this runs, so the directory
+// always exists. settings.json is copied last and marks a finished migration;
+// an interrupted copy is simply redone on the next start.
+if (!existsSync(join(newDir, SETTINGS)) && existsSync(join(oldDir, SETTINGS))) {
   try {
-    rmSync(tmpDir, { recursive: true, force: true });
-    cpSync(oldDir, tmpDir, {
+    cpSync(oldDir, newDir, {
       recursive: true,
       // Chromium's single-instance lock files point at the old process.
-      filter: (src) => !basename(src).startsWith("Singleton"),
+      filter: (src) => src !== join(oldDir, SETTINGS) && !basename(src).startsWith("Singleton"),
     });
-    renameSync(tmpDir, newDir);
+    copyFileSync(join(oldDir, SETTINGS), join(newDir, SETTINGS));
   } catch (error) {
     console.error(`Could not migrate settings from ${oldDir}: `, error);
   }

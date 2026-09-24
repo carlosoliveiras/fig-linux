@@ -142,9 +142,8 @@ export default class WindowManager {
   };
 
   public focusLastWindow() {
-    const window = this.windows.get(this.lastFocusedwindowId);
-
-    window.focus();
+    // Also runs in a second instance that is about to quit and has no windows.
+    this.windows.get(this.lastFocusedwindowId)?.focus();
   }
   public saveState() {
     storage.settings.app.windowsState = {};
