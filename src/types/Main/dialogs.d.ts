@@ -1,6 +1,4 @@
 declare namespace Dialogs {
-  type Providers = "Native" | "Zenity";
-  type Type = "error" | "warning" | "info" | "question";
   type FileFilter = import("electron").FileFilter;
   type OpenDialogOptions = import("electron").OpenDialogOptions;
 
