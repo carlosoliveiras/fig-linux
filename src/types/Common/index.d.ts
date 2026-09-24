@@ -27,29 +27,11 @@ declare namespace Types {
     order?: number;
   }
 
-  interface TabData {
-    micAccess: boolean;
-    view: import("electron").BrowserView;
-  }
-
-  interface WindowInitOpts {
-    userId?: string;
-    tabs?: Types.SavedTab[];
-  }
-
   interface SavedTab {
     title?: string;
     url?: string;
   }
 
-  interface ShortcutsMap {
-    accelerator: string;
-    value: string;
-    type: "action" | "command" | "id";
-  }
-
-  type View = "TopPanel" | "Settings" | "ThemeCreator";
-  type SettingsView = "General" | "Themes";
 
   interface FeatureFlags {
     desktop_beta_use_agent_for_fonts?: boolean;

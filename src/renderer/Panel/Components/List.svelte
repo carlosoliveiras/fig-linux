@@ -59,17 +59,6 @@
           {item.title}
         </span>
       </div>
-      <!-- Why the Figma send setUsingMicrophone: true after setUsingMicrophone: false ?????  -->
-      <!-- And this doesn't work correctly -->
-      <!-- {#if item.isInVoiceCall}
-        <ButtonTool padding="0 4px" {normalBgColor} {hoverBgColor}>
-          {#if item.isUsingMicrophone}
-            <UnMuted />
-          {:else}
-            <Muted />
-          {/if}
-        </ButtonTool>
-      {/if} -->
       <ButtonTool
         padding="0 7px"
         {normalBgColor}

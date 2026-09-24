@@ -1,4 +1,3 @@
-import * as Url from "url";
 import { PROTOCOL, HOMEPAGE } from "Const";
 
 export const isPrototypeUrl = (url: string): boolean =>
@@ -29,16 +28,6 @@ export const normalizeUrl = (url: string): string => {
   const replaceRegExp = new RegExp(`^${PROTOCOL}:/`);
 
   return url.replace(replaceRegExp, HOMEPAGE);
-};
-
-export const getParsedUrl = (data: string): Url.UrlWithStringQuery => {
-  let url = data;
-
-  if (isFigmaProtocolUrl(url)) {
-    url = normalizeUrl(url);
-  }
-
-  return Url.parse(url);
 };
 
 export const isAppAuthGrandLink = (url: string) => /\/app_auth\/.*\/grant/.test(url);

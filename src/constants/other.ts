@@ -1,5 +1,3 @@
-import { parse } from "url";
-
 export const LOGLEVEL = process.env.FIGMA_LOGLEVEL as string | undefined;
 
 export const HOMEPAGE = "https://www.figma.com";
@@ -7,7 +5,6 @@ export const LOGOUT_PAGE = `${HOMEPAGE}/logout`;
 export const LOGIN_PAGE = `${HOMEPAGE}/login`;
 export const RECENT_FILES = `${HOMEPAGE}/files/recent`;
 export const NEW_PROJECT_TAB_URL = `${HOMEPAGE}/desktop_new_tab`;
-export const PARSED_HOMEPAGE = parse("https://www.figma.com");
 
 export const DOWNLOAD_ZIP_URI =
   "https://github.com/Figma-Linux/figma-linux-themes/archive/master.zip";
@@ -22,8 +19,6 @@ export const TEST_THEME_ID = "test-creator-theme";
 
 export const MANIFEST_FILE_NAME = "manifest.json";
 export const CHROME_GPU = "chrome://gpu";
-
-export const REGEXP_APP_AUTH_GRANT = /^\/{0,2}app_auth\/[^/]+\/grant/;
 
 export const FIGMA_SESSION_COOKIE_NAME = "figma.session";
 
