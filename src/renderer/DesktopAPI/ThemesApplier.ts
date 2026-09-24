@@ -91,16 +91,14 @@ export class ThemesApplier {
       }
       if (key === "fg-overlay") {
         el.style.setProperty("--color-icon-menu", value);
+        el.style.setProperty("--fg-overlay", value);
+        el.style.setProperty("--fg-overlay-right", value);
       }
       if (key === "bg-toolbar-hover") {
         el.style.setProperty("--color-bg-toolbar-hover", value);
       }
       if (key === "fg-tab-hover") {
         el.style.setProperty("--color-text-toolbar-hover", value);
-      }
-      if (key === "fg-overlay") {
-        el.style.setProperty("--fg-overlay", value);
-        el.style.setProperty("--fg-overlay-right", value);
       }
       if (key === "fg-toolbar") {
         el.style.setProperty("--color-icon-toolbar", value);
@@ -162,7 +160,6 @@ export class ThemesApplier {
 
     el.style.setProperty("--color-bg", "var(--bg-panel)");
     el.style.setProperty("--color-bg-toolbar", "var(--bg-toolbar)");
-    el.style.setProperty("--color-bg-selected", "var(--bg-panel)");
     el.style.setProperty("--color-text", "var(--text)");
     el.style.setProperty("--color-text-secondary", "var(--text)");
     el.style.setProperty("--color-border", "var(--borders)");
@@ -249,7 +246,7 @@ export class ThemesApplier {
           cssRule.style["fill"] = `var(--text-active)`;
         }
         if (
-          /new_file_creation_topbar--importIcon|close_button--closeX|new_file_creation_topbar--plusIcon|new_file_creation_topbar--importIcon|option_button--_optionButton|raw_components--_iconButton|object_row--layerIcon|segmented_control--icon/.test(
+          /new_file_creation_topbar--importIcon|close_button--closeX|new_file_creation_topbar--plusIcon|option_button--_optionButton|raw_components--_iconButton|object_row--layerIcon|segmented_control--icon/.test(
             cssRule.selectorText,
           )
         ) {
