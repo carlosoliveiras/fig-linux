@@ -691,6 +691,15 @@ export default class ExtensionManager {
       "writeNewExtensionDirectoryToDisk",
       this.writeNewExtensionDirectoryToDisk.bind(this),
     );
+    // Same as above with a flat file list; the renderer exposes it to Figma but
+    // nothing handled it, so every call was rejected.
+    ipcMain.handle(
+      "writeNewExtensionToDisk",
+      (event: IpcMainInvokeEvent, data: WebApi.WriteNewExtensionToDiskArgs) =>
+        this.writeNewExtensionDirectoryToDisk(event, {
+          dir: { name: data.dirName, dirs: [], files: data.files },
+        }),
+    );
     ipcMain.handle(
       "createMultipleNewLocalFileExtensions",
       this.createMultipleNewLocalFileExtensions.bind(this),

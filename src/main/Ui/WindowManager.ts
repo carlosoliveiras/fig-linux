@@ -452,10 +452,17 @@ export default class WindowManager {
       }
     }
   }
-  private closeTab(_: IpcMainEvent, tabId: number) {
-    const window = this.windows.get(this.lastFocusedwindowId);
+  // The panel sends the id of the tab to close. Figma's own close() is sent
+  // from inside the tab with its `suppressReopening` flag instead.
+  private closeTab(event: IpcMainEvent, tabId: number | boolean) {
+    if (typeof tabId !== "number") {
+      const window = this.getWindowByWebContentsId(event.sender.id);
 
-    this.handleCloseTab(window, tabId);
+      window && this.handleCloseTab(window, event.sender.id);
+      return;
+    }
+
+    this.handleCloseTab(this.windows.get(this.lastFocusedwindowId), tabId);
   }
   private closeCommunityTab(_: IpcMainEvent) {
     const window = this.windows.get(this.lastFocusedwindowId);
@@ -558,17 +565,18 @@ export default class WindowManager {
     window.toggleThemeCreatorPreviewMask();
   }
 
+  // Sent by the tab itself, which may be in a window that isn't focused.
   private setIsInVoiceCall(event: IpcMainEvent, isInVoiceCall: boolean) {
-    const window = this.windows.get(this.lastFocusedwindowId);
-    const tabId = event.sender.id;
-
-    window.setIsInVoiceCall(tabId, isInVoiceCall);
+    this.getWindowByWebContentsId(event.sender.id)?.setIsInVoiceCall(
+      event.sender.id,
+      isInVoiceCall,
+    );
   }
   private setUsingMicrophone(event: IpcMainEvent, isUsingMicrophone: boolean) {
-    const window = this.windows.get(this.lastFocusedwindowId);
-    const tabId = event.sender.id;
-
-    window.setUsingMicrophone(tabId, isUsingMicrophone);
+    this.getWindowByWebContentsId(event.sender.id)?.setUsingMicrophone(
+      event.sender.id,
+      isUsingMicrophone,
+    );
   }
 
   private setTabTitle(event: IpcMainEvent, title: string) {
