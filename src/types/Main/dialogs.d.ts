@@ -43,8 +43,6 @@ declare interface ProviderDialog {
   showMessageBoxSync(params: Dialogs.MessageBoxOptions): number;
 
   showOpenDialog(params: Dialogs.OpenOptions): Promise<string[] | null>;
-  showOpenDialogSync(params: Dialogs.OpenOptions): string[] | null;
 
   showSaveDialog(params: Dialogs.SaveOptions): Promise<string | null>;
-  showSaveDialogSync(params: Dialogs.SaveOptions): string | null;
 }

@@ -102,45 +102,13 @@ export default class TabManager {
     return nextTabId;
   }
 
-  public reloadAll() {
-    this.tabs.forEach((t) =>
-      !t.view.webContents.isDestroyed() ? t.view.webContents.reload() : "",
-    );
-  }
   public updateScaleAll(scale: number) {
     this.mainTab.updateScale(scale);
     this.communityTab && this.communityTab.updateScale(scale);
     this.tabs.forEach((t) => t.updateScale(scale));
   }
 
-  public getTabByIndex(index: number) {
-    let i = 0;
-    let foundTab: Types.Tab | undefined;
 
-    this.tabs.forEach((tab) => {
-      if (index === i) {
-        foundTab = tab;
-      }
-
-      i++;
-    });
-
-    return foundTab;
-  }
-
-  public getTabIndex(webContentsId: number) {
-    let i = 0;
-
-    this.tabs.forEach((_, id) => {
-      if (webContentsId === id) {
-        return;
-      }
-
-      i++;
-    });
-
-    return i;
-  }
 
   public reloadTab(tabId: number) {
     const tab = this.getById(tabId);
@@ -255,26 +223,12 @@ export default class TabManager {
     }
   }
 
-  public getTabUrl(tabId: number) {
-    const tab = this.tabs.get(tabId);
-
-    return tab.view.webContents.getURL();
-  }
 
   public isNewFileTab(tabId: number) {
     for (const [_, tab] of this.tabs) {
       if (tab.title && tab.title === NEW_FILE_TAB_TITLE && tab.id === tabId) {
         return true;
       }
-    }
-
-    return false;
-  }
-  public isMainTab(tabId: number) {
-    const keys = [...this.tabs.keys()];
-
-    if (keys[0] === tabId) {
-      return true;
     }
 
     return false;

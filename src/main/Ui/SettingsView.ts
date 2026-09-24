@@ -121,7 +121,6 @@ export default class SettingsView {
 
     this.disableThemesChanged = true;
   }
-  private syncThemesStart() {}
   private syncThemesEnd(themes: Themes.Theme[]) {
     this.view.webContents.send("themesLoaded", themes);
   }
@@ -151,7 +150,6 @@ export default class SettingsView {
     app.on("enableColorSpaceSrgbWasChanged", this.enableColorSpaceSrgbChange.bind(this));
     app.on("chromiumFlagsChanged", this.chromiumFlagsChange.bind(this));
     app.on("disableThemesChanged", this.disableThemesChange.bind(this));
-    app.on("syncThemesStart", this.syncThemesStart.bind(this));
     app.on("syncThemesEnd", this.syncThemesEnd.bind(this));
     app.on("loadCurrentTheme", this.loadCurrentTheme.bind(this));
     app.on("loadCreatorThemes", this.loadCreatorThemes.bind(this));

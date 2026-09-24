@@ -524,11 +524,6 @@ export default class WindowManager {
 
     window.handlePluginManageAction("manage");
   }
-  private handleWidgetManageAction() {
-    const window = this.windows.get(this.lastFocusedwindowId);
-
-    window.handlePluginManageAction("manage-widgets");
-  }
   private handlePluginMenuAction(windowId: number, pluginMenuAction: Menu.MenuAction) {
     const window = this.windows.get(windowId ?? this.lastFocusedwindowId);
 
@@ -710,9 +705,7 @@ export default class WindowManager {
     app.on("openUrlFromCommunity", this.openUrlFromCommunity.bind(this));
     app.on("windowFocus", this.windowFocus.bind(this));
     app.on("windowClose", this.windowClose.bind(this));
-    app.on("handleUrl", this.handleUrl.bind(this));
     app.on("handlePluginManageAction", this.handlePluginManageAction.bind(this));
-    app.on("handleWidgetManageAction", this.handleWidgetManageAction.bind(this));
     app.on("handlePluginMenuAction", this.handlePluginMenuAction.bind(this));
     app.on("toggleCurrentWindowDevTools", this.toggleCurrentWindowDevTools.bind(this));
     app.on("toggleSettingsDeveloperTools", this.toggleSettingsDevTools.bind(this));

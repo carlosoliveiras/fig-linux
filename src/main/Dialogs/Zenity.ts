@@ -91,37 +91,6 @@ export class ZenityDialogs implements ProviderDialog {
 
     return result;
   };
-  public showOpenDialogSync = (options: Dialogs.OpenOptions) => {
-    const cmd = ["zenity --file-selection"];
-
-    if (options.defaultPath) {
-      cmd.push(`--filename="${options.defaultPath}"`);
-    }
-    if (Array.isArray(options.properties) && options.properties.length > 0) {
-      for (const prop of options.properties) {
-        switch (prop) {
-          case "openDirectory": {
-            cmd.push(`--directory`);
-            break;
-          }
-          case "multiSelections": {
-            cmd.push(`--multiple`);
-            break;
-          }
-        }
-      }
-    }
-
-    let result: string[] | undefined;
-    try {
-      const stdout = process.execSync(cmd.join(" "));
-      result = stdout.replace(/\n/, "").split("|");
-    } catch (error) {
-      return null;
-    }
-
-    return result;
-  };
 
   public showSaveDialog = async (options: Dialogs.SaveOptions) => {
     const cmd = ["zenity --file-selection --save --confirm-overwrite"];
@@ -133,23 +102,6 @@ export class ZenityDialogs implements ProviderDialog {
     let result: string | undefined;
     try {
       result = await process.exec(cmd.join(" "));
-      result = result.replace(/\n/, "");
-    } catch (error) {
-      return null;
-    }
-
-    return result;
-  };
-  public showSaveDialogSync = (options: Dialogs.SaveOptions) => {
-    const cmd = ["zenity --file-selection --save --confirm-overwrite"];
-
-    if (options.defaultPath) {
-      cmd.push(`--filename="${options.defaultPath}"`);
-    }
-
-    let result: string | undefined;
-    try {
-      result = process.execSync(cmd.join(" "));
       result = result.replace(/\n/, "");
     } catch (error) {
       return null;

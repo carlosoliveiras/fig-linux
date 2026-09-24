@@ -1,4 +1,4 @@
-import { MessageBoxOptions, OpenDialogOptions, dialog } from "electron";
+import { MessageBoxOptions, dialog } from "electron";
 
 export class NativeDialogs implements ProviderDialog {
   constructor() {}
@@ -72,17 +72,9 @@ export class NativeDialogs implements ProviderDialog {
     const result = await dialog.showOpenDialog(null, options);
     return !result.canceled ? result.filePaths : null;
   };
-  public showOpenDialogSync = (options: Dialogs.OpenOptions) => {
-    const result = dialog.showOpenDialogSync(null, options as OpenDialogOptions);
-    return result || [];
-  };
 
   public showSaveDialog = async (options: Dialogs.SaveOptions) => {
     const result = await dialog.showSaveDialog(null, options);
     return !result.canceled && result.filePath ? result.filePath : null;
-  };
-  public showSaveDialogSync = (options: Dialogs.SaveOptions) => {
-    const result = dialog.showSaveDialogSync(null, options);
-    return result;
   };
 }

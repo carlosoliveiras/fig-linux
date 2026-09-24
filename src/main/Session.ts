@@ -1,16 +1,13 @@
-import { session, Event, Cookie, app } from "electron";
+import { session } from "electron";
 
 import * as Const from "Const";
 import { logger } from "./Logger";
-import { isSameCookieDomain } from "Utils/Main";
 
 export default class Session {
   private _hasFigmaSession: boolean;
-  private assessSessionTimer: NodeJS.Timer;
 
   constructor() {
     this._hasFigmaSession = null;
-    this.assessSessionTimer = null;
   }
 
   public get hasFigmaSession() {
