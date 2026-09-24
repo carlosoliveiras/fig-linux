@@ -20,6 +20,9 @@ export function initIpc() {
   ipcRenderer.on("toggleThemeCreatorPreviewMask", (_: IpcRendererEvent) => {
     creatorTheme.togglePreviewVisible();
   });
+  ipcRenderer.on("loadSettings", (_: IpcRendererEvent, settings: Types.SettingsInterface) => {
+    settingsStore.set(settings);
+  });
   settingsStore.set(ipcRenderer.sendSync("getSettings"));
 
   ipcRenderer.send("frontReady");

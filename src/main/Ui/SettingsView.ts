@@ -100,26 +100,14 @@ export default class SettingsView {
     this.view.webContents.send("toggleThemeCreatorPreviewMask");
   }
 
-  private enableColorSpaceSrgbChange(enabled: boolean) {
-    const previousValue = storage.settings.app.enableColorSpaceSrgb;
-
-    if (enabled === previousValue) {
-      return;
-    }
-
-    this.enableColorSpaceSrgbWasChanged = true;
+  private enableColorSpaceSrgbChange(changed: boolean) {
+    this.enableColorSpaceSrgbWasChanged = changed;
   }
   private chromiumFlagsChange(enabled: boolean) {
     this.chromiumFlagsChanged = enabled;
   }
-  private disableThemesChange(enabled: boolean) {
-    const previousValue = storage.settings.app.disableThemes;
-
-    if (enabled === previousValue) {
-      return;
-    }
-
-    this.disableThemesChanged = true;
+  private disableThemesChange(changed: boolean) {
+    this.disableThemesChanged = changed;
   }
   private syncThemesEnd(themes: Themes.Theme[]) {
     this.view.webContents.send("themesLoaded", themes);
@@ -136,7 +124,7 @@ export default class SettingsView {
     storage.settings.theme.currentTheme = theme.id;
   }
 
-  private loadSettings() {
+  public loadSettings() {
     this.view.webContents.send("loadSettings", storage.settings);
   }
   private handleFrontReady() {

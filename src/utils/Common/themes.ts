@@ -32,7 +32,7 @@ export const variablesColorsMap: Themes.ColorsMap = {
   "rgba(0, 0, 0, 0.6)": "var(--text)",
   "rgba(0, 0, 0, 0.5)": "var(--text)",
   "rgba(0, 0, 0, 0.75)": "var(--text)",
-  "rgba(0, 0, 0, 0.8)": "var(--textActive)",
+  "rgba(0, 0, 0, 0.8)": "var(--text-active)",
   "rgba(0, 0, 0, 0.9)": "var(--text)",
   "rgba(0, 0, 0, 0.95)": "var(--text)",
   "rgba(44, 44, 44, 0.8)": "var(--bg-toolbar)",

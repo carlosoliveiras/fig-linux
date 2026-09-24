@@ -13,7 +13,7 @@ import {
 export function initIpc() {
   ipcRenderer.send("frontReady");
 
-  ipcRenderer.on("closeAllTabs", () => {
+  ipcRenderer.on("closeAllTab", () => {
     tabs.set([]);
   });
   ipcRenderer.on("didTabAdd", (_, data) => {

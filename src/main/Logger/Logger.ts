@@ -46,16 +46,24 @@ export class Logger {
     );
   };
 
+  private write(level: number, argv: unknown[]) {
+    const msg = this.format(level, ...argv);
+
+    if (msg !== undefined) {
+      this.log(msg);
+    }
+  }
+
   public debug = (...argv: unknown[]): void => {
-    this.log(this.format(LogLevel.DEBUG, ...argv));
+    this.write(LogLevel.DEBUG, argv);
   };
   public info = (...argv: unknown[]): void => {
-    this.log(this.format(LogLevel.INFO, ...argv));
+    this.write(LogLevel.INFO, argv);
   };
   public warn = (...argv: unknown[]): void => {
-    this.log(this.format(LogLevel.WARN, ...argv));
+    this.write(LogLevel.WARN, argv);
   };
   public error = (...argv: unknown[]): void => {
-    this.log(this.format(LogLevel.ERROR, ...argv));
+    this.write(LogLevel.ERROR, argv);
   };
 }
