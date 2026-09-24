@@ -1,7 +1,10 @@
 {
   "watch": [
-    "src/main/"
+    "src/main/",
+    "src/utils/",
+    "src/constants/",
+    "src/types/"
   ],
   "exec": "npm run rollup:main; npm run run",
-  "ext": "js, json, ts, proto, css, png, jpeg, jpg, ico"
+  "ext": "ts,json"
 }
