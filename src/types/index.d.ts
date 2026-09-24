@@ -234,10 +234,6 @@ declare namespace Electron {
       listener: (event: IpcMainInvokeEvent, data: WebApi.SetClipboardData) => void,
     ): this;
     on(
-      channel: "set-use-zenity",
-      listener: (event: IpcMainInvokeEvent, value: boolean) => void,
-    ): this;
-    on(
       channel: "updateFigmaUiScale",
       listener: (event: IpcMainInvokeEvent, theme: Themes.Theme) => void,
     ): this;
@@ -433,7 +429,6 @@ declare namespace Electron {
     send(channel: "saveCreatorTheme", theme: Themes.Theme): this;
     send(channel: "syncThemes"): this;
     send(channel: "setClipboardData", data: WebApi.SetClipboardData): this;
-    send(channel: "set-use-zenity", value: boolean): this;
     send(channel: "windowDidMaximized"): this;
     send(channed: "windowDidRestored"): this;
     send(channed: "changeTheme", theme: Themes.Theme): this;
