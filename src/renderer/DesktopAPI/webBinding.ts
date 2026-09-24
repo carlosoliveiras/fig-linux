@@ -83,12 +83,10 @@ const initWebApi = (props: IntiApiOptions) => {
     appVersion: props.appVersion,
     fileBrowser: props.fileBrowser,
     postMessage: function (name, args, transferList): void {
-      console.log("postMessage, name, args, transferList: ", name, args, transferList);
       channel.port1.postMessage({ name, args }, transferList);
     },
     registerCallback: function (name, args, callback) {
       const id = nextCallbackID++;
-      console.log(`Register pending promise with id: "${id}", name: "${name}", args: `, args);
       registeredCallbacks.set(id, callback);
       channel.port1.postMessage({ name, args, callbackID: id });
       return (): void => {
@@ -199,10 +197,8 @@ const publicAPI: any = {
     sendMsgToMain("setIsInVoiceCall", args.isInVoiceCall);
   },
 
-  addTabAnalyticsMetadata(args: any) {
-    // sendMsgToMain("addTabAnalyticsMetadata", args.isUsingMicrophone);
-    console.log("Method addTabAnalyticsMetadata not implemented, args: ", args);
-  },
+  // Figma calls this for its analytics; nothing to do on the desktop side.
+  addTabAnalyticsMetadata() {},
   async requestMicrophonePermission() {
     let granted = false;
 

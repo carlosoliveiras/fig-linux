@@ -127,16 +127,18 @@
               {/if}
             </ButtonTool>
           </toolBar>
-          <iframeView
-            style={`
-              ${getColorPallet($creatorTheme.theme).join(";")};
-              z-index: ${$settings.app.useOldPreviewer ? 2 : 0};
-              display: ${$settings.app.useOldPreviewer ? "block" : "none"};
-              user-select: ${$settings.app.useOldPreviewer ? "all" : "none"};
-            `}
-          >
-            <Preview />
-          </iframeView>
+          {#if $settings.app.useOldPreviewer}
+            <iframeView
+              style={`
+                ${getColorPallet($creatorTheme.theme).join(";")};
+                z-index: 2;
+                display: block;
+                user-select: all;
+              `}
+            >
+              <Preview />
+            </iframeView>
+          {/if}
           <iframeView
             bind:this={previewer}
             style={`
