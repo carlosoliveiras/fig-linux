@@ -1,6 +1,5 @@
 import {
   app,
-  net,
   session,
   clipboard,
   nativeImage,
@@ -68,7 +67,9 @@ export default class App {
 
       this.windowManager.openUrl(req.url);
 
-      return net.fetch(req.url, { method: req.method });
+      // net.fetch() of a figma:// URL comes back to this same handler, so it
+      // looped and opened a new tab on every pass.
+      return new Response();
     });
   };
 
