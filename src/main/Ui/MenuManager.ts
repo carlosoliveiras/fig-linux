@@ -207,7 +207,7 @@ export default class MenuManager {
     label: string,
     id: string,
     accelerator?: string,
-    enabled: boolean = true,
+    enabled = true,
     visible = true,
   ) {
     const props: MenuItemConstructorOptions = {

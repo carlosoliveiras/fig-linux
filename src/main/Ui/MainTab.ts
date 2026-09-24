@@ -146,7 +146,7 @@ export default class MainTab {
         app.emit("signOut");
       }
 
-      if (to.search && to.search.match(/[\?\&]redirected=1/)) {
+      if (to.search && to.search.match(/[?&]redirected=1/)) {
         event.preventDefault();
         return;
       }

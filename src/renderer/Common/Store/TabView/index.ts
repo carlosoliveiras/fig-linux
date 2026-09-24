@@ -11,7 +11,6 @@ function createTabView() {
     set: (id: number | string, item: string) =>
       update((store) => {
         store[id] = item;
-        store = store;
         return store;
       }),
   };
