@@ -14,7 +14,7 @@
   "scripts": {
     "start": "run-s build run",
     "dev": "run-s rollup:dev",
-    "run": "electron dist/main/main.js",
+    "run": "electron dist",
     "run:watch": "nodemon --config ./config/nodemon.json",
     "rollup": "rollup -c ./config/rollup.renderer.config.js",
     "rollup:main": "rollup -c ./config/rollup.main.config.js",
