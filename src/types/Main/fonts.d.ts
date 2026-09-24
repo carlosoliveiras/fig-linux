@@ -7,6 +7,17 @@ declare namespace Fonts {
     weight: number;
     stretch: number;
     italic: boolean;
+    variationAxes?: Array<VariationAxis>;
+  }
+
+  interface VariationAxis {
+    tag: string;
+    name: string;
+    value: number;
+    min: number;
+    max: number;
+    default: number;
+    hidden: boolean;
   }
 
   interface IFonts {
@@ -37,6 +48,7 @@ declare namespace Fonts {
     postScriptCIDfindfontName?: string;
     WWSFamilyName?: string;
     WWSSubFamilyName?: string;
+    [nameId: number]: string;
   }
 
   interface TableName {

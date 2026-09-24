@@ -36,7 +36,7 @@ export default class TTC {
       const fontOffset = this.buffer.readUInt32BE(o + i * 4);
       const ttf = new TTF(this.buffer, fontOffset);
 
-      result.push(ttf.getData());
+      result.push(...ttf.getData());
     }
 
     return result;
