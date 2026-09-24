@@ -9,16 +9,6 @@ export async function access(path: string): Promise<boolean> {
   }
 }
 
-export function accessSync(path: string): boolean {
-  try {
-    fs.accessSync(path);
-
-    return true;
-  } catch (error) {
-    return false;
-  }
-}
-
 export async function mkPath(path: string) {
   return fs.promises.mkdir(path, { recursive: true });
 }

@@ -313,6 +313,12 @@ export default class WindowManager {
   private windowClosed(windowId: number) {
     this.windows.delete(windowId);
 
+    // Most handlers act on the last focused window; don't leave it pointing at
+    // a closed one until another window happens to get focus.
+    if (this.lastFocusedwindowId === windowId && this.windows.size > 0) {
+      this.lastFocusedwindowId = [...this.windows.keys()].pop();
+    }
+
     if (this.windows.size === 0) {
       app.emit("quitApp");
     }
