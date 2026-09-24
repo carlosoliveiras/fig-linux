@@ -18,6 +18,12 @@
   import ColorPalette from "./ColorPalette.svelte";
   import Tutorial from "./Tutorial.svelte";
 
+  // Installed builds load this page from dist/ (file://), the dev build from the dev server.
+  const previewPreload =
+    location.protocol === "file:"
+      ? `file://${decodeURIComponent(new URL("./renderer/themePreviewPreload.js", location.href).pathname)}`
+      : `file://${resolve(process.cwd(), "dist/renderer", "themePreviewPreload.js")}`;
+
   export let zIndex: number;
 
   let zoomViewHeight: number;
@@ -141,11 +147,7 @@
           >
             <webview
               bind:this={webviews[0]}
-              preload={`file://${resolve(
-                process.cwd(),
-                "dist/renderer",
-                "themePreviewPreload.js",
-              )}`}
+              preload={previewPreload}
               style={`
                   user-select: none;
                   width: 1099px;
@@ -156,11 +158,7 @@
             />
             <webview
               bind:this={webviews[1]}
-              preload={`file://${resolve(
-                process.cwd(),
-                "dist/renderer",
-                "themePreviewPreload.js",
-              )}`}
+              preload={previewPreload}
               style={`
                   user-select: none;
                   width: 1099px;
@@ -171,11 +169,7 @@
             />
             <webview
               bind:this={webviews[2]}
-              preload={`file://${resolve(
-                process.cwd(),
-                "dist/renderer",
-                "themePreviewPreload.js",
-              )}`}
+              preload={previewPreload}
               style={`
                   user-select: none;
                   width: 1099px;
@@ -186,11 +180,7 @@
             />
             <webview
               bind:this={webviews[3]}
-              preload={`file://${resolve(
-                process.cwd(),
-                "dist/renderer",
-                "themePreviewPreload.js",
-              )}`}
+              preload={previewPreload}
               style={`
                   user-select: none;
                   width: 1099px;

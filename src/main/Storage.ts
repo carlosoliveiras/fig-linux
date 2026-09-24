@@ -1,9 +1,8 @@
-import { app, ipcMain, IpcMainEvent, ipcRenderer } from "electron";
+import { app, ipcMain, IpcMainEvent } from "electron";
 import * as path from "path";
 import * as fs from "fs";
 
 import { DEFAULT_SETTINGS, accessSync } from "Utils/Main";
-import { logger } from "./Logger";
 
 /**
  * This class has dual initialization: in main process and renderer process
@@ -55,8 +54,8 @@ export class Storage {
     try {
       settings = JSON.parse(content);
     } catch (error) {
-      logger.error("Parse settings.json file error: ", error);
-      logger.warn("Apply default settings instead file settings.");
+      // The logger reads settings, so it doesn't exist yet at this point.
+      console.error("Parse settings.json file error, using the default settings: ", error);
       settings = DEFAULT_SETTINGS;
     }
 

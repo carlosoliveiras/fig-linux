@@ -251,12 +251,10 @@ export default class Window {
     this.window.webContents.send("newFileBtnVisible", false);
   }
   public createFile(args: WebApi.CreateFile) {
-    const newFileTab = this.tabManager.getByTitle(NEW_FILE_TAB_TITLE);
     const tab = this.addTab(args.url);
 
     tab.loadUrl(args.url);
-    this.closeTab(newFileTab.id);
-    this.tabWasClosed(newFileTab.id);
+    this.closeNewFileTab();
 
     this.window.webContents.send("newFileBtnVisible", true);
 
@@ -301,6 +299,8 @@ export default class Window {
     this.settingsView.updateProps(bounds);
 
     this.window.addBrowserView(this.settingsView.view);
+    // The view is kept between openings; closing it sends its settings back.
+    this.settingsView.loadSettings();
 
     isDev && toggleDetachedDevTools(this.settingsView.view.webContents);
 

@@ -160,7 +160,7 @@ export default class ExtensionManager {
         this.extensionMap.forEach((entry) => {
           const manifest = entry.observeFiles.get(MANIFEST_FILE_NAME);
 
-          manifest.close();
+          manifest?.close();
           entry.observeFiles.set(MANIFEST_FILE_NAME, null);
         });
       }
@@ -668,7 +668,7 @@ export default class ExtensionManager {
   private webCancelCallback(event: IpcMainEvent, callbackID: number) {
     const key = `${callbackID}:${event.sender.id}`;
 
-    this.registeredCancelCallbackMap.get(key)();
+    this.registeredCancelCallbackMap.get(key)?.();
     this.registeredCancelCallbackMap.delete(key);
   }
 

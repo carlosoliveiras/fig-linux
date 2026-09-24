@@ -143,7 +143,7 @@ export default class TabManager {
           return this.tabs.get(id);
         } else if (this.mainTab.id === id) {
           return this.mainTab;
-        } else if (this.communityTab.id === id) {
+        } else if (this.communityTab?.id === id) {
           return this.communityTab;
         }
       }

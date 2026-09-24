@@ -29,7 +29,7 @@ const onWebMessage = (event: MessageEvent) => {
     return;
   }
   if (msg.cancelCallbackID != null) {
-    mainProcessCancelCallbacks.get(msg.cancelCallbackID)();
+    mainProcessCancelCallbacks.get(msg.cancelCallbackID)?.();
     mainProcessCancelCallbacks.delete(msg.cancelCallbackID);
     return;
   }
@@ -50,7 +50,7 @@ const onWebMessage = (event: MessageEvent) => {
       if (resultPromise instanceof Promise) {
         resultPromise
           .then((result) => {
-            webPort.postMessage({ result: result.data, promiseID: msg.promiseID });
+            webPort.postMessage({ result: result?.data, promiseID: msg.promiseID });
           })
           .catch((error) => {
             const errorString = (error && error.name) || "Promise error";
@@ -412,7 +412,7 @@ const publicAPI: any = {
 
       const whitelistedFormats = ["com.adobe.pdf", "com.adobe.xd", "com.bohemiancoding.sketch.v3"];
 
-      const formats = args.getArray("formats");
+      const formats: string[] = args.formats ?? [];
 
       for (const format of formats) {
         let data = null;
@@ -437,19 +437,23 @@ const publicAPI: any = {
               data = Buffer.from(unsafeText);
             }
           }
-        } else if (format === "image/jpeg" || format === "image/png") {
-          data = E.clipboard.readImage().toBitmap();
+        } else if (format === "image/png") {
+          data = E.clipboard.readImage().toPNG();
+        } else if (format === "image/jpeg") {
+          data = E.clipboard.readImage().toJPEG(100);
         } else if (whitelistedFormats.indexOf(format) !== -1) {
           data = E.clipboard.readBuffer(format);
         }
 
         if (data && data.byteLength > 0) {
+          // Small Buffers share a pooled ArrayBuffer, so copy out just their bytes.
+          const bytes = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
           const result = {
-            data: data.buffer,
+            data: bytes,
             format: format,
           };
 
-          resolve({ data: result, transferList: [data.buffer] });
+          resolve({ data: result, transferList: [bytes] });
           return;
         }
       }
@@ -469,18 +473,16 @@ const publicAPI: any = {
 };
 
 const init = (fileBrowser: boolean): void => {
-  window.addEventListener(
-    "message",
-    (event) => {
-      if (event.data !== "init" || !event.ports || !event.ports.length) {
-        return;
-      }
+  const onInit = (event: MessageEvent) => {
+    if (event.data !== "init" || !event.ports || !event.ports.length) {
+      return;
+    }
 
-      webPort = event.ports[0];
-      webPort.onmessage = onWebMessage;
-    },
-    { once: true },
-  );
+    window.removeEventListener("message", onInit);
+    webPort = event.ports[0];
+    webPort.onmessage = onWebMessage;
+  };
+  window.addEventListener("message", onInit);
 
   const initWebOptions: IntiApiOptions = {
     version: API_VERSION,

@@ -8,7 +8,7 @@
 
   export let normalFgColor = "var(--fg-toolbar-active)";
   export let normalBgColor = "var(--bg-toolbar-active)";
-  export let activeBgColor = "var(--bg-toolbar-active"; // --color-bg-brand-pressed: #0a6dc2
+  export let activeBgColor = "var(--bg-toolbar-active)"; // --color-bg-brand-pressed: #0a6dc2
   export let hoverBgColor = "var(--bg-toolbar-active)";
   export let isActive = false;
 
