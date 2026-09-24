@@ -1,6 +1,6 @@
 import * as E from "electron";
 import { DEFAULT_THEME, SELECTORS_TO_IGNORE, PROPS_WITH_COLOR, CHROME_GPU } from "Const";
-import { getColorsMap, variablesColorsMap } from "Utils/Common";
+import { variablesColorsMap } from "Utils/Common";
 
 export class ThemesApplier {
   private currentTheme: Themes.Theme;
@@ -185,7 +185,7 @@ export class ThemesApplier {
     const figmaCoreStylesheet = this.getCoreStylesheet();
     if (location.href.match(CHROME_GPU)) {
       const newStyles = document.createElement("style");
-      newStyles.innerText = "html { background-color: cadetblue; }";
+      newStyles.textContent = "html { background-color: cadetblue; }";
 
       document.head.appendChild(newStyles);
     }
@@ -194,7 +194,6 @@ export class ThemesApplier {
       return;
     }
 
-    const colorsMap = getColorsMap(this.currentTheme.palette);
     const additionStyleRules: string[] = [
       "#react-page { background-color: var(--bg-panel); }",
       `span[class*="action_option--shortcut"] { color: var(--fg-overlay); }`,
@@ -220,7 +219,7 @@ export class ThemesApplier {
           PROPS_WITH_COLOR.forEach((colorProp) => {
             const colorValue = cssRule.style[colorProp];
 
-            if (colorValue != "" && Object.prototype.hasOwnProperty.call(colorsMap, colorValue)) {
+            if (colorValue != "" && Object.hasOwn(variablesColorsMap, colorValue)) {
               cssRule.style[colorProp] = `${variablesColorsMap[colorValue]}`;
             }
           });
@@ -338,16 +337,16 @@ export class ThemesApplier {
             `${cssRule.selectorText}::-webkit-scrollbar-thumb { background: var(--color-scrollbar, rgba(179, 179, 179, 0.5)); border-radius: 10px; }`,
           );
         }
-        additionStyleRules.push(
-          `button[class*=css_builder--colorBgPressed] { color: var(--fg-toolbar-active); }`,
-        );
-        additionStyleRules.push(`input { color: var(--text-active); }`);
       }
     }
+    additionStyleRules.push(
+      `button[class*=css_builder--colorBgPressed] { color: var(--fg-toolbar-active); }`,
+    );
+    additionStyleRules.push(`input { color: var(--text-active); }`);
 
     if (additionStyleRules.length) {
       const newStyles = document.createElement("style");
-      newStyles.innerText = additionStyleRules.join("\n");
+      newStyles.textContent = additionStyleRules.join("\n");
 
       document.head.appendChild(newStyles);
     }

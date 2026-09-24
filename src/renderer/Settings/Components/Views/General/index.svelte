@@ -1,5 +1,4 @@
 <script lang="ts">
-  import { randomUUID } from "crypto";
   import { ipcRenderer } from "electron";
   import { InputRange, CheckBox, InputText, ListBox } from "Common/Input";
   import { Text, Label, Flex, FlexItem, Line } from "Common";
@@ -13,8 +12,9 @@
   export let zIndex: number;
 
   let switchItems: Types.TabItem[] = [];
-  $: switchItems = $settings.app.commandSwitches.map((item) => ({
-    id: randomUUID(),
+  // Keyed by position: a fresh id per rebuild recreated every row on any settings change.
+  $: switchItems = $settings.app.commandSwitches.map((item, index) => ({
+    id: String(index),
     text: item.switch,
     itemArgs: {
       item,
@@ -61,12 +61,18 @@
     }
   }
 
-  $: {
-    ipcRenderer.invoke("updateFigmaUiScale", $settings.ui.scaleFigmaUI);
+  // These blocks rerun on any settings edit; only message the windows when the
+  // scale itself changed.
+  let sentFigmaUiScale: number;
+  let sentPanelScale: number;
+  $: if ($settings.ui.scaleFigmaUI !== sentFigmaUiScale) {
+    sentFigmaUiScale = $settings.ui.scaleFigmaUI;
+    ipcRenderer.invoke("updateFigmaUiScale", sentFigmaUiScale);
   }
-  $: {
-    ipcRenderer.invoke("updatePanelScale", $settings.ui.scalePanel);
-    $settings.app.panelHeight = Math.floor(TOPPANELHEIGHT * $settings.ui.scalePanel);
+  $: if ($settings.ui.scalePanel !== sentPanelScale) {
+    sentPanelScale = $settings.ui.scalePanel;
+    ipcRenderer.invoke("updatePanelScale", sentPanelScale);
+    $settings.app.panelHeight = Math.floor(TOPPANELHEIGHT * sentPanelScale);
   }
 </script>
 

@@ -61,7 +61,6 @@ export function onClickCommunity(svelteEvent: { detail: MouseEvent }) {
   }
 }
 export function onClickNewProject() {
-  console.log("onClickNewProject");
   ipcRenderer.send("newProject");
   newFileVisible.set(false);
 }
