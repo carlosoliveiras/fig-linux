@@ -6,6 +6,7 @@ import MainTab from "./MainTab";
 import CommunityTab from "./CommunityTab";
 import Tab from "./Tab";
 import { storage } from "Main/Storage";
+import { Listeners } from "Utils/Main";
 
 export default class TabManager {
   public mainTab: MainTab;
@@ -15,6 +16,7 @@ export default class TabManager {
 
   public lastFocusedTab: number | undefined;
   private tabs: Map<number, Tab> = new Map();
+  private listeners = new Listeners();
 
   public get mainTabWebContentId() {
     return this.mainTab.view.webContents.id;
@@ -258,9 +260,19 @@ export default class TabManager {
     storage.settings.theme.currentTheme = theme.id;
   }
 
-  private registerEvents() {
-    ipcMain.on("changeTheme", this.changeTheme.bind(this));
+  // Hidden tabs are detached from the window, so closing it doesn't end them.
+  public destroy() {
+    this.listeners.removeAll();
 
-    app.on("loadCurrentTheme", this.loadCurrentTheme.bind(this));
+    for (const tab of [this.mainTab, this.communityTab, ...this.tabs.values()]) {
+      if (tab && !tab.view.webContents.isDestroyed()) {
+        tab.view.webContents.close();
+      }
+    }
+  }
+
+  private registerEvents() {
+    this.listeners.on(ipcMain, "changeTheme", this.changeTheme.bind(this));
+    this.listeners.on(app, "loadCurrentTheme", this.loadCurrentTheme.bind(this));
   }
 }

@@ -13,7 +13,7 @@ import {
   NEW_FILE_TAB_TITLE,
 } from "Const";
 import { isDev, isCommunityUrl, isAppAuthRedeem, normalizeUrl, parseURL } from "Utils/Common";
-import { panelUrlDev, panelUrlProd, toggleDetachedDevTools } from "Utils/Main";
+import { panelUrlDev, panelUrlProd, toggleDetachedDevTools, Listeners } from "Utils/Main";
 import Tab from "./Tab";
 
 export default class Window {
@@ -23,6 +23,7 @@ export default class Window {
   private state: Types.WindowState;
 
   private _userId: string;
+  private listeners = new Listeners();
 
   constructor(state: Types.WindowState) {
     this.window = new BrowserWindow(WINDOW_DEFAULT_OPTIONS);
@@ -606,8 +607,20 @@ export default class Window {
     this.window.close();
   }
 
+  // Covers every way a window closes: the panel button, the menu and the window manager (Alt+F4).
+  private onClosed(windowId: number) {
+    this.listeners.removeAll();
+    this.tabManager.destroy();
+    this.settingsView.destroy();
+
+    app.emit("windowClosed", windowId);
+  }
+
   private registerEvents() {
-    app.on("loadCurrentTheme", this.loadCurrentTheme.bind(this));
+    const windowId = this.window.id;
+
+    this.listeners.on(app, "loadCurrentTheme", this.loadCurrentTheme.bind(this));
+    this.window.on("closed", () => this.onClosed(windowId));
 
     this.window.on("show", this.showHandler.bind(this));
     this.window.on("resize", this.updateTabsBounds.bind(this));
