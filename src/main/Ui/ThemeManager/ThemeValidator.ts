@@ -1,7 +1,11 @@
 import * as path from "path";
 import { logger } from "Main/Logger";
 
-import { AVAILABLE_THEME_FIELDS, AVAILABLE_THEME_FIELDS_COUNT, AVAILABLE_THEME_COLOR_VALUE } from "Const";
+import { AVAILABLE_THEME_COLOR_VALUE, DEFAULT_PALETTE } from "Const";
+import { keysToCamelCase } from "Utils/Common";
+
+// Theme files use camelCase keys; the default palette is the list of fields.
+const AVAILABLE_THEME_FIELDS = Object.keys(keysToCamelCase(DEFAULT_PALETTE));
 
 export default class ThemeValidator {
   public isValidThemeFile(filePath: string, theme: Themes.Theme): boolean {
@@ -34,7 +38,7 @@ export default class ThemeValidator {
 
     const palette = Object.keys(theme.palette);
 
-    if (palette.length !== AVAILABLE_THEME_FIELDS_COUNT) {
+    if (palette.length !== AVAILABLE_THEME_FIELDS.length) {
       logger.error(`The file "${fileName}" has invalid count of palette colors`);
       return false;
     }

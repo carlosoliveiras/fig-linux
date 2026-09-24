@@ -152,50 +152,19 @@
               user-select: ${$settings.app.useOldPreviewer ? "none" : "all"};
             `}
           >
-            <webview
-              bind:this={webviews[0]}
-              preload={previewPreload}
-              style={`
-                  user-select: none;
-                  width: 1099px;
-                  height: 609px;
-                `}
-              title="Figma recent files"
-              src="https://www.figma.com/files/recent"
-            />
-            <webview
-              bind:this={webviews[1]}
-              preload={previewPreload}
-              style={`
-                  user-select: none;
-                  width: 1099px;
-                  height: 609px;
-                `}
-              title="Figma recent files"
-              src="https://www.figma.com/files/recent"
-            />
-            <webview
-              bind:this={webviews[2]}
-              preload={previewPreload}
-              style={`
-                  user-select: none;
-                  width: 1099px;
-                  height: 609px;
-                `}
-              title="Figma recent files"
-              src="https://www.figma.com/files/recent"
-            />
-            <webview
-              bind:this={webviews[3]}
-              preload={previewPreload}
-              style={`
-                  user-select: none;
-                  width: 1099px;
-                  height: 609px;
-                `}
-              title="Figma recent files"
-              src="https://www.figma.com/files/recent"
-            />
+            {#each [0, 1, 2, 3] as i}
+              <webview
+                bind:this={webviews[i]}
+                preload={previewPreload}
+                style={`
+                    user-select: none;
+                    width: 1099px;
+                    height: 609px;
+                  `}
+                title="Figma recent files"
+                src="https://www.figma.com/files/recent"
+              />
+            {/each}
           </iframeView>
           <Tutorial slot="layout_1" />
         </ZoomView>

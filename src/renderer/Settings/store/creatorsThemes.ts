@@ -1,11 +1,10 @@
 import { writable, get } from "svelte/store";
 
 function createCreatorsThemes() {
-  const { subscribe, set, update } = writable<Themes.Theme[]>([]);
+  const { subscribe, set } = writable<Themes.Theme[]>([]);
 
   return {
     subscribe,
-    update,
     set,
     // `exceptId`: the theme being edited may keep its own name.
     exists: (name: string, exceptId?: string) =>
