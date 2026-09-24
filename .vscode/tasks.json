@@ -19,11 +19,6 @@
       "command": "npm run start"
     },
     {
-      "label": "Run Release",
-      "type": "shell",
-      "command": "npm run start"
-    },
-    {
       "label": "Build",
       "type": "shell",
       "command": "npm run build"
@@ -41,7 +36,7 @@
     {
       "label": "Replace installed version",
       "type": "shell",
-      "command": "cp -rf ./build/linux-unpacked/* /opt/fig-linux/"
+      "command": "npm run local:install"
     }
   ]
 }
