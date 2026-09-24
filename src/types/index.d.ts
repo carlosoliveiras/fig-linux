@@ -332,14 +332,6 @@ declare namespace Electron {
       listener: (event: IpcMainInvokeEvent, data: WebApi.WriteFiles) => Promise<void> | void,
     ): void;
     handle(
-      channel: "getFonts",
-      listener: (event: IpcMainInvokeEvent) => Promise<void> | Fonts.IFonts,
-    ): void;
-    handle(
-      channel: "getFontFile",
-      listener: (event: IpcMainInvokeEvent, data: WebApi.GetFontFile) => Promise<void> | Buffer,
-    ): void;
-    handle(
       channel: "selectExportDirectory",
       listener: (event: IpcMainInvokeEvent) => Promise<string | null>,
     ): void;
@@ -501,8 +493,6 @@ declare namespace Electron {
     invoke(channel: "themesIsDisabled"): Promise<boolean>;
     invoke(channel: "isDevToolsOpened"): Promise<boolean>;
     invoke(channel: "writeFiles", data: WebApi.WriteFiles): Promise<void>;
-    invoke(channel: "getFonts"): Promise<Fonts.IFonts>;
-    invoke(channel: "getFontFile", data: WebApi.GetFontFile): Promise<Buffer>;
     invoke(channel: "selectExportDirectory"): Promise<string | null>;
     invoke(channel: "updatePanelScale", scale: number): this;
     invoke(channel: "requestMicrophonePermission"): this;

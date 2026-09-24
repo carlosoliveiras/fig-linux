@@ -1,7 +1,6 @@
 import "./migrateConfig";
 import App from "./App";
 import Session from "./Session";
-import FontManager from "./Fonts";
 import ExtensionManager from "./ExtensionManager";
 import ThemeManager from "./Ui/ThemeManager";
 import ThemeValidator from "./Ui/ThemeManager/ThemeValidator";
@@ -19,6 +18,5 @@ new App(
   new WindowManager(),
   new ExtensionManager(),
   new Session(),
-  new FontManager(),
   new ThemeManager(new ThemeValidator()),
 );

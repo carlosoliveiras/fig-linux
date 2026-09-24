@@ -29,13 +29,6 @@ export const BASE_DEFAULT_SETTINGS: Types.SettingsInterface = {
       // { switch: "enable-accelerated-2d-canvas" },
       { switch: "use-vulkan" },
     ],
-    fontDirs: [
-      "/usr/share/fonts",
-      "/usr/local/share/fonts",
-      "/run/host/fonts",
-      "/run/host/user-fonts",
-      `${process.env.HOME}/.local/share/fonts`,
-    ],
     recentlyClosedTabs: [],
     windowsState: {},
     lastOpenedTabs: {},

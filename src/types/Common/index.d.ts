@@ -85,7 +85,6 @@ declare namespace Types {
       panelHeight: number;
       saveLastOpenedTabs: boolean;
       exportDir: string;
-      fontDirs: string[];
       recentlyClosedTabs: SavedTab[];
       commandSwitches: CommandSwitch[];
       windowsState: {

@@ -387,25 +387,19 @@ const publicAPI: any = {
     return { data: isOpened };
   },
 
-  async getFonts(args: WebApi.GetFonts) {
-    const fonts = await E.ipcRenderer.invoke("getFonts");
-    return { data: fonts };
+  // Only the fonts Figma provides are used, so files stay the same for
+  // everyone who opens them. Figma still asks for local fonts and waits for
+  // an answer, so these reply with an empty list.
+  async getFonts() {
+    return { data: {} };
   },
 
-  async getModifiedFonts(args: WebApi.GetFonts) {
-    const fonts = await E.ipcRenderer.invoke("getFonts");
-    return { data: fonts };
+  async getModifiedFonts() {
+    return { data: {} };
   },
 
-  async getFontsModifiedAt(args: WebApi.GetFonts) {
-    const fonts = await E.ipcRenderer.invoke("getFonts");
-    return { data: fonts };
-  },
-
-  async getFontFile(args: WebApi.GetFontFile) {
-    const fontBuffer = await E.ipcRenderer.invoke("getFontFile", args);
-
-    return { data: fontBuffer, transferList: [fontBuffer] };
+  async getFontsModifiedAt() {
+    return { data: {} };
   },
 
   getClipboardData(args: any) {
