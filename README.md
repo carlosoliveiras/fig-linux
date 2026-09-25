@@ -5,7 +5,7 @@ fig-linux is an unofficial [Electron](https://www.electronjs.org)-based [Figma](
 It is not affiliated with, endorsed or sponsored by Figma, Inc. "Figma" is a trademark of Figma, Inc.
 
 <p align="center">
-	<img src="images/screenshot1.jpg">
+	<img src="images/banner.png">
 </p>
 
 ## Installation

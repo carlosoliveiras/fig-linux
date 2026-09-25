@@ -13,7 +13,13 @@ import {
   NEW_FILE_TAB_TITLE,
 } from "Const";
 import { isDev, isCommunityUrl, isAppAuthRedeem, normalizeUrl, parseURL } from "Utils/Common";
-import { panelUrlDev, panelUrlProd, toggleDetachedDevTools, Listeners } from "Utils/Main";
+import {
+  appIconPath,
+  panelUrlDev,
+  panelUrlProd,
+  toggleDetachedDevTools,
+  Listeners,
+} from "Utils/Main";
 import Tab from "./Tab";
 
 export default class Window {
@@ -26,7 +32,7 @@ export default class Window {
   private listeners = new Listeners();
 
   constructor(state: Types.WindowState) {
-    this.window = new BrowserWindow(WINDOW_DEFAULT_OPTIONS);
+    this.window = new BrowserWindow({ ...WINDOW_DEFAULT_OPTIONS, icon: appIconPath });
     this.tabManager = new TabManager(this.window.id);
     this.settingsView = new SettingsView();
     this.state = state;
