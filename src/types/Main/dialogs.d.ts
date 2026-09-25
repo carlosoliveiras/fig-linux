@@ -1,6 +1,4 @@
 declare namespace Dialogs {
-  type Providers = "Native" | "Zenity";
-  type Type = "error" | "warning" | "info" | "question";
   type FileFilter = import("electron").FileFilter;
   type OpenDialogOptions = import("electron").OpenDialogOptions;
 
@@ -43,8 +41,6 @@ declare interface ProviderDialog {
   showMessageBoxSync(params: Dialogs.MessageBoxOptions): number;
 
   showOpenDialog(params: Dialogs.OpenOptions): Promise<string[] | null>;
-  showOpenDialogSync(params: Dialogs.OpenOptions): string[] | null;
 
   showSaveDialog(params: Dialogs.SaveOptions): Promise<string | null>;
-  showSaveDialogSync(params: Dialogs.SaveOptions): string | null;
 }

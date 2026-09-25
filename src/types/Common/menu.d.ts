@@ -48,5 +48,4 @@ declare namespace Menu {
     property?: string;
     propertyValue?: boolean;
   }
-  interface PluginMenuData {}
 }

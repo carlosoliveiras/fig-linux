@@ -3,7 +3,6 @@ import {
   app,
   shell,
   Rectangle,
-  WebContents,
   BrowserView,
   BrowserWindow,
   HandlerDetails,
@@ -14,13 +13,11 @@ import {
 import { preloadScriptPathDev, preloadScriptPathProd } from "Utils/Main";
 import {
   isDev,
-  isFigmaUrl,
   isValidProjectLink,
   isPrototypeUrl,
   isAppAuthRedeem,
   isFigmaDocLink,
 } from "Utils/Common";
-import { dialogs } from "Main/Dialogs";
 import { logger } from "Main/Logger";
 
 export default class Tab {
@@ -29,7 +26,6 @@ export default class Tab {
   public url?: string;
   public moves?: boolean;
   public fileKey?: string;
-  public isUsingMicrophone?: boolean;
   public isInVoiceCall?: boolean;
   public view: BrowserView;
 
@@ -110,7 +106,6 @@ export default class Tab {
 
     if (from.pathname === "/login") {
       // TODO:
-      // this.tabManager.reloadAll();
 
       event.preventDefault();
       return;
@@ -120,7 +115,7 @@ export default class Tab {
       app.emit("signOut");
     }
 
-    if (to.search && to.search.match(/[\?\&]redirected=1/)) {
+    if (to.search && to.search.match(/[?&]redirected=1/)) {
       event.preventDefault();
       return;
     }
@@ -137,63 +132,6 @@ export default class Tab {
     }
 
     shell.openExternal(url);
-  }
-
-  private permissionHandler(
-    webContents: WebContents,
-    permission:
-      | "clipboard-read"
-      | "clipboard-sanitized-write"
-      | "display-capture"
-      | "fullscreen"
-      | "geolocation"
-      | "idle-detection"
-      | "media"
-      | "mediaKeySystem"
-      | "midi"
-      | "midiSysex"
-      | "notifications"
-      | "pointerLock"
-      | "openExternal"
-      | "window-management"
-      | "unknown",
-    callback: (permissionGranted: boolean) => void,
-  ) {
-    const allowByDefault = [
-      "fullscreen",
-      "pointerLock",
-      "clipboard-read",
-      "clipboard-write",
-      "clipboard-sanitized-write",
-    ];
-
-    if (allowByDefault.includes(permission)) {
-      return callback(true);
-    }
-
-    if (permission === "media") {
-      if (this.isUsingMicrophone) {
-        return callback(true);
-      }
-
-      const id = dialogs.showMessageBoxSync({
-        type: "question",
-        title: "Figma",
-        message: "Microphone access required for voice call.",
-        detail: `Allow microphone access?`,
-        textOkButton: "Allow",
-        textCancelButton: "Deny",
-        defaultFocusedButton: "Ok",
-      });
-
-      if (id === 0) {
-        this.isUsingMicrophone = true;
-
-        return callback(true);
-      }
-    }
-
-    return callback(false);
   }
 
   private windowOpenHandler(details: HandlerDetails) {
@@ -214,6 +152,5 @@ export default class Tab {
     this.view.webContents.on("dom-ready", this.onDomReady.bind(this));
     this.view.webContents.on("did-create-window", this.onNewWindow.bind(this));
 
-    this.view.webContents.session.setPermissionRequestHandler(this.permissionHandler.bind(this));
   }
 }

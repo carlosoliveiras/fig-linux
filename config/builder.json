@@ -1,11 +1,15 @@
 {
-  "appId": "figma-linux",
-  "productName": "figma-linux",
-  "extraMetadata": "main/main.js",
+  "appId": "fig-linux",
+  "productName": "fig-linux",
   "icon": "resources/icons",
   "extraFiles": [
     {
-      "from": "lib/"
+      "from": "resources/AppRun",
+      "to": "AppRun"
+    },
+    {
+      "from": "resources/icons",
+      "to": "icons"
     }
   ],
   "files": [
@@ -13,7 +17,6 @@
   ],
   "directories": {
     "app": "dist/",
-    "buildResources": "build/installers",
     "output": "build/installers"
   },
   "fileAssociations": [
@@ -37,19 +40,16 @@
       "--rpm-rpmbuild-define=_build_id_links none"
     ]
   },
-  "pacman": {
-    "depends": []
-  },
   "appImage": {
     "category": "Graphics",
-    "desktop": "resources/figma-linux-appimage.desktop"
+    "desktop": "resources/fig-linux-appimage.desktop"
   },
   "linux": {
     "description": "Unofficial desktop application for linux",
     "icon": "resources/icons",
     "category": "Graphics",
     "packageCategory": "Graphics",
-    "maintainer": "Chugunov Roman <Zebs-BMK@yandex.ru>",
+    "maintainer": "Jos\u00e9 Carlos <vxcarlosig@gmail.com>",
     "artifactName": "${name}_${version}_${platform}_${arch}.${ext}",
     "fileAssociations": [
       {

@@ -44,6 +44,11 @@
   let currentItem = items[0];
   let currentId = currentItem.id;
 
+  // Views mount on first visit and then stay mounted. Theme Creator runs four
+  // full Figma previews, which every window loaded in the background before.
+  let visited = new Set<string>();
+  $: visited = visited.add(currentItem.id);
+
   function onTabItemClick(item: Types.SetingsTabItem) {
     currentItem = item;
   }
@@ -80,11 +85,13 @@
   </HeaderModal>
   <settingsBody>
     {#each items as item (item.id)}
-      <svelte:component
-        this={item.bodyComponent}
-        zIndex={item.id === currentItem.id ? 2 : 0}
-        on:setSettingsTabViewIndex={onSetTabViewIndex}
-      />
+      {#if visited.has(item.id)}
+        <svelte:component
+          this={item.bodyComponent}
+          zIndex={item.id === currentItem.id ? 2 : 0}
+          on:setSettingsTabViewIndex={onSetTabViewIndex}
+        />
+      {/if}
     {/each}
   </settingsBody>
 </div>

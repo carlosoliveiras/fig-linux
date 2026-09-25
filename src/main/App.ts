@@ -1,6 +1,5 @@
 import {
   app,
-  net,
   session,
   clipboard,
   nativeImage,
@@ -23,14 +22,12 @@ import ExtensionManager from "./ExtensionManager";
 import ThemeManager from "./Ui/ThemeManager";
 import WindowManager from "./Ui/WindowManager";
 import Session from "./Session";
-import FontManager from "./Fonts";
 
 export default class App {
   constructor(
     private windowManager: WindowManager,
     private extensionManager: ExtensionManager,
     private session: Session,
-    private fontManager: FontManager,
     private themeManager: ThemeManager,
   ) {
     const isSingleInstance = app.requestSingleInstanceLock();
@@ -70,7 +67,9 @@ export default class App {
 
       this.windowManager.openUrl(req.url);
 
-      return net.fetch(req.url, { method: req.method });
+      // net.fetch() of a figma:// URL comes back to this same handler, so it
+      // looped and opened a new tab on every pass.
+      return new Response();
     });
   };
 
@@ -109,12 +108,19 @@ export default class App {
     // Full flags reference: https://peter.sh/experiments/chromium-command-line-switches/
     const switches = storage.settings.app.commandSwitches;
 
-    if (!switches.length) {
-      return;
-    }
-
     for (const item of switches) {
       app.commandLine.appendSwitch(item.switch, item.value);
+    }
+
+    // Run natively on Wayland when the session offers it and fall back to X11
+    // otherwise. Without the hint the app always goes through XWayland, which
+    // costs a copy per frame and leaves the UI blurry on HiDPI screens because
+    // fractional scaling is not forwarded.
+    // Users can force a backend by adding their own ozone-platform switch.
+    const hasOzoneSwitch = switches.some((item) => item.switch.startsWith("ozone-platform"));
+
+    if (!hasOzoneSwitch) {
+      app.commandLine.appendSwitch("ozone-platform-hint", "auto");
     }
 
     const colorSpace = storage.settings.app.enableColorSpaceSrgb;
@@ -126,12 +132,9 @@ export default class App {
     }
   }
   private setAuthedUsers(_: IpcMainEvent, userIds: string[]) {
-    if (!Array.isArray(storage.settings.authedUserIDs)) {
-      storage.settings.authedUserIDs = userIds;
-      storage.save();
-    }
-
-    storage.settings.authedUserIDs = [...new Set([...storage.settings.authedUserIDs, ...userIds])];
+    storage.settings.authedUserIDs = [
+      ...new Set([...(storage.settings.authedUserIDs ?? []), ...userIds]),
+    ];
   }
   private setWorkspaceName(_: IpcMainEvent, name: string) {
     logger.warn("The setWorkspaceName not implemented, workspaceName: ", name);
@@ -152,20 +155,6 @@ export default class App {
     } else {
       clipboard.writeBuffer(format, buffer);
     }
-  }
-  private async getFonts(_: IpcMainInvokeEvent) {
-    const dirs = storage.settings.app.fontDirs;
-
-    return this.fontManager.getFonts(dirs);
-  }
-  private async getFontFile(_: IpcMainInvokeEvent, data: WebApi.GetFontFile) {
-    const file = await this.fontManager.getFontFile(data.path);
-
-    if (file && file.byteLength > 0) {
-      return file;
-    }
-
-    return null;
   }
   private async logout() {
     await request({
@@ -209,8 +198,6 @@ export default class App {
     ipcMain.on("setFigjamEnabled", this.setFigjamEnabled.bind(this));
     ipcMain.on("setClipboardData", this.setClipboardData.bind(this));
 
-    ipcMain.handle("getFonts", this.getFonts.bind(this));
-    ipcMain.handle("getFontFile", this.getFontFile.bind(this));
 
     app.on("ready", this.ready.bind(this));
     app.on("second-instance", this.secondInstance.bind(this));

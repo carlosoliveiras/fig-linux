@@ -1,16 +1,24 @@
-import { session, Event, Cookie, app } from "electron";
+import { session } from "electron";
 
 import * as Const from "Const";
 import { logger } from "./Logger";
-import { isSameCookieDomain } from "Utils/Main";
+import { dialogs } from "./Dialogs";
+
+const ALLOWED_PERMISSIONS = [
+  "fullscreen",
+  "pointerLock",
+  "clipboard-read",
+  "clipboard-write",
+  "clipboard-sanitized-write",
+];
 
 export default class Session {
   private _hasFigmaSession: boolean;
-  private assessSessionTimer: NodeJS.Timer;
+  // Tabs (by webContents id) where the user allowed the microphone.
+  private microphoneAllowed = new Set<number>();
 
   constructor() {
     this._hasFigmaSession = null;
-    this.assessSessionTimer = null;
   }
 
   public get hasFigmaSession() {
@@ -18,9 +26,34 @@ export default class Session {
   }
 
   public handleAppReady = () => {
-    session.defaultSession.setPermissionRequestHandler((_, permission, callback) => {
-      const whitelist = ["fullscreen", "pointerLock"];
-      callback(whitelist.includes(permission));
+    // One handler for the whole session; each tab used to replace it with its own.
+    session.defaultSession.setPermissionRequestHandler((webContents, permission, callback) => {
+      if (ALLOWED_PERMISSIONS.includes(permission)) {
+        return callback(true);
+      }
+      if (permission !== "media") {
+        return callback(false);
+      }
+      if (this.microphoneAllowed.has(webContents.id)) {
+        return callback(true);
+      }
+
+      dialogs
+        .showMessageBox({
+          type: "question",
+          title: "Figma",
+          message: "Microphone access required for voice call.",
+          detail: "Allow microphone access?",
+          textOkButton: "Allow",
+          textCancelButton: "Deny",
+          defaultFocusedButton: "Ok",
+        })
+        .then((button) => {
+          if (button === 0) {
+            this.microphoneAllowed.add(webContents.id);
+          }
+          callback(button === 0);
+        });
     });
 
     const defaultUserAgent = session.defaultSession.getUserAgent();

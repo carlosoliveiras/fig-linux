@@ -7,7 +7,6 @@ import { logger } from "Main/Logger";
 type MICO = MenuItemConstructorOptions;
 
 export default class MenuManager {
-  private menu: Menu;
   private _menu: Map<number, Menu.State> = new Map();
 
   constructor() {}
@@ -52,15 +51,6 @@ export default class MenuManager {
     }
 
     // TODO: will complete this when the Figma develop's team will complete the desktop API for widgets
-    // if (state?.widgetMenuData?.length > 0) {
-    //   template.push({
-    //     label: "Widgets",
-    //     submenu: this.parseFigmaMenu(state.widgetMenuData),
-    //   });
-    // } else {
-    //   template.push(this.widgetsMenu());
-    // }
-
     template.push({ type: "separator" });
 
     template.push(this.item("Settings", "openSettingsView"));
@@ -70,13 +60,16 @@ export default class MenuManager {
 
     template.push(this.item("Quit", "quitApp", "Ctrl+Alt+Q"));
 
-    this.menu = Menu.buildFromTemplate(template);
-
-    return this.menu;
+    return Menu.buildFromTemplate(template);
   }
 
-  public openMainMenuHandler(width: number, window: BrowserWindow, callback?: () => void) {
-    this.menu.popup({
+  public openMainMenuHandler(
+    width: number,
+    window: BrowserWindow,
+    menu: Menu,
+    callback?: () => void,
+  ) {
+    menu.popup({
       callback,
       window,
       x: width - MENU_WIDTH,
@@ -214,7 +207,7 @@ export default class MenuManager {
     label: string,
     id: string,
     accelerator?: string,
-    enabled: boolean = true,
+    enabled = true,
     visible = true,
   ) {
     const props: MenuItemConstructorOptions = {
@@ -304,19 +297,6 @@ export default class MenuManager {
       ],
     };
   }
-  private widgetsMenu(): MenuItemConstructorOptions {
-    return {
-      label: "Widgets",
-      submenu: [
-        {
-          label: "Manage widgets...",
-          click() {
-            app.emit("handleWidgetManageAction");
-          },
-        },
-      ],
-    };
-  }
   private helpMenu(): MenuItemConstructorOptions {
     return {
       role: "help",
@@ -324,9 +304,7 @@ export default class MenuManager {
         this.openExternal("Help Page", LINKS.HELP_PAGE),
         this.openExternal("Plugins documentation", LINKS.PLUGINS_DOCS),
         this.openExternal("Community Forum", LINKS.FIGMA_COMMUNITY_FORUM),
-        this.openExternal("Figma Linux Community Forum", LINKS.FIGMA_LINUX_COMMUNITY_FORUM),
-        this.openExternal("Figma Linux in Telegram", LINKS.FIGMA_LINUX_TELEGRAM),
-        this.openExternal("Figma Linux Themes", LINKS.THEMES_REPO),
+        this.openExternal("Fig Linux Themes", LINKS.THEMES_REPO),
         this.openExternal("Video Tutorials", LINKS.VIDEO_TUTORIALS),
         this.openExternal("Release Notes", LINKS.RELEASE_NOTES),
         this.openExternal("Legal Summary", LINKS.LEGAL_SUMMARY),

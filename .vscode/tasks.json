@@ -19,11 +19,6 @@
       "command": "npm run start"
     },
     {
-      "label": "Run Release",
-      "type": "shell",
-      "command": "npm run start"
-    },
-    {
       "label": "Build",
       "type": "shell",
       "command": "npm run build"
@@ -41,12 +36,7 @@
     {
       "label": "Replace installed version",
       "type": "shell",
-      "command": "cp -rf ./build/linux-unpacked/* /opt/figma-linux/"
-    },
-    {
-      "label": "Copy settings",
-      "type": "shell",
-      "command": "rm -rf ~/.config/Electron && cp -rf ~/.config/figma-linux ~/.config/Electron"
+      "command": "npm run local:install"
     }
   ]
 }

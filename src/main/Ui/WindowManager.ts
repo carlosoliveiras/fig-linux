@@ -142,9 +142,8 @@ export default class WindowManager {
   };
 
   public focusLastWindow() {
-    const window = this.windows.get(this.lastFocusedwindowId);
-
-    window.focus();
+    // Also runs in a second instance that is about to quit and has no windows.
+    this.windows.get(this.lastFocusedwindowId)?.focus();
   }
   public saveState() {
     storage.settings.app.windowsState = {};
@@ -160,7 +159,7 @@ export default class WindowManager {
     const recentlyClosedTabs = storage.settings.app.recentlyClosedTabs;
 
     if (recentlyClosedTabs?.length > 0) {
-      for (const tabInfo of recentlyClosedTabs.reverse()) {
+      for (const tabInfo of [...recentlyClosedTabs].reverse()) {
         this.closedTabs.set(tabInfo.title, {
           title: tabInfo.title,
           url: tabInfo.url,
@@ -309,11 +308,16 @@ export default class WindowManager {
   }
 
   private windowClose(windowId: number) {
-    const window = this.windows.get(windowId);
-
-    window.close();
-
+    this.windows.get(windowId)?.close();
+  }
+  private windowClosed(windowId: number) {
     this.windows.delete(windowId);
+
+    // Most handlers act on the last focused window; don't leave it pointing at
+    // a closed one until another window happens to get focus.
+    if (this.lastFocusedwindowId === windowId && this.windows.size > 0) {
+      this.lastFocusedwindowId = [...this.windows.keys()].pop();
+    }
 
     if (this.windows.size === 0) {
       app.emit("quitApp");
@@ -370,9 +374,14 @@ export default class WindowManager {
       };
     }
 
-    const menu = this.menuManager.getMenu(state);
+    // Figma sends updateFullscreenMenuState on every UI change; rebuilding the
+    // whole menu is only needed when its content changed.
+    const stateKey = JSON.stringify(state);
+    if (window.menuStateKey === stateKey) {
+      return;
+    }
 
-    window.setMenu(menu);
+    window.setMenu(this.menuManager.getMenu(state), stateKey);
   }
   private newProject(_: IpcMainEvent) {
     const window = this.windows.get(this.lastFocusedwindowId);
@@ -454,10 +463,17 @@ export default class WindowManager {
       }
     }
   }
-  private closeTab(_: IpcMainEvent, tabId: number) {
-    const window = this.windows.get(this.lastFocusedwindowId);
+  // The panel sends the id of the tab to close. Figma's own close() is sent
+  // from inside the tab with its `suppressReopening` flag instead.
+  private closeTab(event: IpcMainEvent, tabId: number | boolean) {
+    if (typeof tabId !== "number") {
+      const window = this.getWindowByWebContentsId(event.sender.id);
 
-    this.handleCloseTab(window, tabId);
+      window && this.handleCloseTab(window, event.sender.id);
+      return;
+    }
+
+    this.handleCloseTab(this.windows.get(this.lastFocusedwindowId), tabId);
   }
   private closeCommunityTab(_: IpcMainEvent) {
     const window = this.windows.get(this.lastFocusedwindowId);
@@ -513,6 +529,11 @@ export default class WindowManager {
     storage.settings = settings;
     storage.save();
 
+    // Panels read their settings (tab scale, new project button) from loadSettings.
+    for (const [_, win] of this.windows) {
+      win.sendSettingsToPanel();
+    }
+
     window.closeSettingsView();
   }
   private handleUrl(path: string) {
@@ -524,11 +545,6 @@ export default class WindowManager {
     const window = this.windows.get(this.lastFocusedwindowId);
 
     window.handlePluginManageAction("manage");
-  }
-  private handleWidgetManageAction() {
-    const window = this.windows.get(this.lastFocusedwindowId);
-
-    window.handlePluginManageAction("manage-widgets");
   }
   private handlePluginMenuAction(windowId: number, pluginMenuAction: Menu.MenuAction) {
     const window = this.windows.get(windowId ?? this.lastFocusedwindowId);
@@ -565,17 +581,18 @@ export default class WindowManager {
     window.toggleThemeCreatorPreviewMask();
   }
 
+  // Sent by the tab itself, which may be in a window that isn't focused.
   private setIsInVoiceCall(event: IpcMainEvent, isInVoiceCall: boolean) {
-    const window = this.windows.get(this.lastFocusedwindowId);
-    const tabId = event.sender.id;
-
-    window.setIsInVoiceCall(tabId, isInVoiceCall);
+    this.getWindowByWebContentsId(event.sender.id)?.setIsInVoiceCall(
+      event.sender.id,
+      isInVoiceCall,
+    );
   }
   private setUsingMicrophone(event: IpcMainEvent, isUsingMicrophone: boolean) {
-    const window = this.windows.get(this.lastFocusedwindowId);
-    const tabId = event.sender.id;
-
-    window.setUsingMicrophone(tabId, isUsingMicrophone);
+    this.getWindowByWebContentsId(event.sender.id)?.setUsingMicrophone(
+      event.sender.id,
+      isUsingMicrophone,
+    );
   }
 
   private setTabTitle(event: IpcMainEvent, title: string) {
@@ -592,11 +609,6 @@ export default class WindowManager {
     const window = this.getWindowByWebContentsId(event.sender.id);
 
     window.openCommunity(args);
-  }
-  private updateVisibleNewProjectBtn(event: IpcMainEvent, visible: boolean) {
-    const window = this.getWindowByWebContentsId(event.sender.id);
-
-    window.updateVisibleNewProjectBtn(event, visible);
   }
 
   private changeTheme(event: IpcMainEvent, theme: Themes.Theme) {
@@ -616,6 +628,7 @@ export default class WindowManager {
     this.menuManager.openMainMenuHandler(
       width,
       window.win,
+      window.menu,
       window.openMainMenuCloseHandler.bind(window),
     );
   }
@@ -625,9 +638,8 @@ export default class WindowManager {
     window.openSettingsView();
   }
   private handleCallbackForTab(webContentsId: number, cbId: number, args: any) {
-    const window = this.getWindowByWebContentsId(webContentsId);
-
-    window.handleCallbackForTab(webContentsId, cbId, args);
+    // The tab may have closed since the observer was registered.
+    this.getWindowByWebContentsId(webContentsId)?.handleCallbackForTab(webContentsId, cbId, args);
   }
   private windowMinimize(event: IpcMainEvent) {
     const window = this.getWindowByWebContentsId(event.sender.id);
@@ -679,7 +691,6 @@ export default class WindowManager {
     ipcMain.on("changeTheme", this.changeTheme.bind(this));
     ipcMain.on("openFile", this.openFile.bind(this));
     ipcMain.on("openCommunity", this.openCommunity.bind(this));
-    ipcMain.on("updateVisibleNewProjectBtn", this.updateVisibleNewProjectBtn.bind(this));
     ipcMain.on("frontReady", this.handleFrontReady.bind(this));
     ipcMain.on("updateFullscreenMenuState", this.updateFullscreenMenuState.bind(this));
     ipcMain.on("windowMinimize", this.windowMinimize.bind(this));
@@ -710,10 +721,8 @@ export default class WindowManager {
     app.on("openUrlInNewTab", this.openUrlInNewTab.bind(this));
     app.on("openUrlFromCommunity", this.openUrlFromCommunity.bind(this));
     app.on("windowFocus", this.windowFocus.bind(this));
-    app.on("windowClose", this.windowClose.bind(this));
-    app.on("handleUrl", this.handleUrl.bind(this));
+    app.on("windowClosed", this.windowClosed.bind(this));
     app.on("handlePluginManageAction", this.handlePluginManageAction.bind(this));
-    app.on("handleWidgetManageAction", this.handleWidgetManageAction.bind(this));
     app.on("handlePluginMenuAction", this.handlePluginMenuAction.bind(this));
     app.on("toggleCurrentWindowDevTools", this.toggleCurrentWindowDevTools.bind(this));
     app.on("toggleSettingsDeveloperTools", this.toggleSettingsDevTools.bind(this));

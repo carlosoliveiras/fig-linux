@@ -1,4 +1,3 @@
-import * as fs from "fs";
 import { net, ClientRequestConstructorOptions } from "electron";
 
 export const request = (options: ClientRequestConstructorOptions): Promise<Request.Responce> =>
@@ -19,32 +18,12 @@ export const request = (options: ClientRequestConstructorOptions): Promise<Reque
       .end();
   });
 
-export async function downloadFile(url: string, savePath: string): Promise<void> {
-  return new Promise((res, rej) => {
-    net
-      .request(url)
-      .on("response", (response) => {
-        const buffers: Uint8Array[] = [];
-        let length = 0;
+export async function fetchBuffer(url: string): Promise<Buffer> {
+  const response = await net.fetch(url);
 
-        const onData = (chunk: Buffer) => {
-          buffers.push(chunk);
-          length += chunk.length;
-        };
-        const onEnd = async () => {
-          const buffer = Buffer.concat(buffers);
+  if (!response.ok) {
+    throw new Error(`GET ${url} failed: ${response.status} ${response.statusText}`);
+  }
 
-          await fs.promises.writeFile(savePath, buffer).catch((error) => {
-            rej(error);
-          });
-
-          res();
-        };
-
-        response.on("error", rej);
-        response.on("data", onData);
-        response.on("end", onEnd);
-      })
-      .end();
-  });
+  return Buffer.from(await response.arrayBuffer());
 }

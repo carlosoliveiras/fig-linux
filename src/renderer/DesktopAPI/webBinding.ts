@@ -29,11 +29,12 @@ const onWebMessage = (event: MessageEvent) => {
     return;
   }
   if (msg.cancelCallbackID != null) {
-    mainProcessCancelCallbacks.get(msg.cancelCallbackID)();
+    mainProcessCancelCallbacks.get(msg.cancelCallbackID)?.();
     mainProcessCancelCallbacks.delete(msg.cancelCallbackID);
     return;
   }
-  if (!msg.name || !(msg.name in publicAPI)) {
+  // Own methods only: `in` also matched inherited names like "constructor" or "toString".
+  if (!msg.name || !Object.hasOwn(publicAPI, msg.name)) {
     sendMsgToMain("logWarn", "[desktop] Unhandled message", msg.name);
     return;
   }
@@ -41,7 +42,7 @@ const onWebMessage = (event: MessageEvent) => {
   let resultPromise = undefined;
 
   try {
-    resultPromise = msg.name && publicAPI && publicAPI[msg.name](msg.args);
+    resultPromise = publicAPI[msg.name](msg.args);
   } catch (e) {
     console.error("onWebMessage, err: ", msg.name, e);
     throw e;
@@ -50,7 +51,7 @@ const onWebMessage = (event: MessageEvent) => {
       if (resultPromise instanceof Promise) {
         resultPromise
           .then((result) => {
-            webPort.postMessage({ result: result.data, promiseID: msg.promiseID });
+            webPort.postMessage({ result: result?.data, promiseID: msg.promiseID });
           })
           .catch((error) => {
             const errorString = (error && error.name) || "Promise error";
@@ -83,12 +84,10 @@ const initWebApi = (props: IntiApiOptions) => {
     appVersion: props.appVersion,
     fileBrowser: props.fileBrowser,
     postMessage: function (name, args, transferList): void {
-      console.log("postMessage, name, args, transferList: ", name, args, transferList);
       channel.port1.postMessage({ name, args }, transferList);
     },
     registerCallback: function (name, args, callback) {
       const id = nextCallbackID++;
-      console.log(`Register pending promise with id: "${id}", name: "${name}", args: `, args);
       registeredCallbacks.set(id, callback);
       channel.port1.postMessage({ name, args, callbackID: id });
       return (): void => {
@@ -199,10 +198,8 @@ const publicAPI: any = {
     sendMsgToMain("setIsInVoiceCall", args.isInVoiceCall);
   },
 
-  addTabAnalyticsMetadata(args: any) {
-    // sendMsgToMain("addTabAnalyticsMetadata", args.isUsingMicrophone);
-    console.log("Method addTabAnalyticsMetadata not implemented, args: ", args);
-  },
+  // Figma calls this for its analytics; nothing to do on the desktop side.
+  addTabAnalyticsMetadata() {},
   async requestMicrophonePermission() {
     let granted = false;
 
@@ -387,25 +384,19 @@ const publicAPI: any = {
     return { data: isOpened };
   },
 
-  async getFonts(args: WebApi.GetFonts) {
-    const fonts = await E.ipcRenderer.invoke("getFonts");
-    return { data: fonts };
+  // Only the fonts Figma provides are used, so files stay the same for
+  // everyone who opens them. Figma still asks for local fonts and waits for
+  // an answer, so these reply with an empty list.
+  async getFonts() {
+    return { data: {} };
   },
 
-  async getModifiedFonts(args: WebApi.GetFonts) {
-    const fonts = await E.ipcRenderer.invoke("getFonts");
-    return { data: fonts };
+  async getModifiedFonts() {
+    return { data: {} };
   },
 
-  async getFontsModifiedAt(args: WebApi.GetFonts) {
-    const fonts = await E.ipcRenderer.invoke("getFonts");
-    return { data: fonts };
-  },
-
-  async getFontFile(args: WebApi.GetFontFile) {
-    const fontBuffer = await E.ipcRenderer.invoke("getFontFile", args);
-
-    return { data: fontBuffer, transferList: [fontBuffer] };
+  async getFontsModifiedAt() {
+    return { data: {} };
   },
 
   getClipboardData(args: any) {
@@ -418,7 +409,7 @@ const publicAPI: any = {
 
       const whitelistedFormats = ["com.adobe.pdf", "com.adobe.xd", "com.bohemiancoding.sketch.v3"];
 
-      const formats = args.getArray("formats");
+      const formats: string[] = args.formats ?? [];
 
       for (const format of formats) {
         let data = null;
@@ -443,19 +434,23 @@ const publicAPI: any = {
               data = Buffer.from(unsafeText);
             }
           }
-        } else if (format === "image/jpeg" || format === "image/png") {
-          data = E.clipboard.readImage().toBitmap();
+        } else if (format === "image/png") {
+          data = E.clipboard.readImage().toPNG();
+        } else if (format === "image/jpeg") {
+          data = E.clipboard.readImage().toJPEG(100);
         } else if (whitelistedFormats.indexOf(format) !== -1) {
           data = E.clipboard.readBuffer(format);
         }
 
         if (data && data.byteLength > 0) {
+          // Small Buffers share a pooled ArrayBuffer, so copy out just their bytes.
+          const bytes = data.buffer.slice(data.byteOffset, data.byteOffset + data.byteLength);
           const result = {
-            data: data.buffer,
+            data: bytes,
             format: format,
           };
 
-          resolve({ data: result, transferList: [data.buffer] });
+          resolve({ data: result, transferList: [bytes] });
           return;
         }
       }
@@ -475,18 +470,16 @@ const publicAPI: any = {
 };
 
 const init = (fileBrowser: boolean): void => {
-  window.addEventListener(
-    "message",
-    (event) => {
-      if (event.data !== "init" || !event.ports || !event.ports.length) {
-        return;
-      }
+  const onInit = (event: MessageEvent) => {
+    if (event.data !== "init" || !event.ports || !event.ports.length) {
+      return;
+    }
 
-      webPort = event.ports[0];
-      webPort.onmessage = onWebMessage;
-    },
-    { once: true },
-  );
+    window.removeEventListener("message", onInit);
+    webPort = event.ports[0];
+    webPort.onmessage = onWebMessage;
+  };
+  window.addEventListener("message", onInit);
 
   const initWebOptions: IntiApiOptions = {
     version: API_VERSION,

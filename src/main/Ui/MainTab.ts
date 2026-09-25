@@ -137,7 +137,6 @@ export default class MainTab {
       const to = parse(url);
 
       if (from.pathname === "/login") {
-        // this.tabManager.reloadAll();
 
         event.preventDefault();
         return;
@@ -147,7 +146,7 @@ export default class MainTab {
         app.emit("signOut");
       }
 
-      if (to.search && to.search.match(/[\?\&]redirected=1/)) {
+      if (to.search && to.search.match(/[?&]redirected=1/)) {
         event.preventDefault();
         return;
       }

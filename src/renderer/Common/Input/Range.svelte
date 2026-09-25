@@ -2,8 +2,8 @@
   export let value: number;
 
   export let readonly = false;
-  export let max = 0;
-  export let min = 100;
+  export let max = 100;
+  export let min = 0;
   export let step = 1;
 
   export let width = "auto";

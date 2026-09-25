@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Figma, Community, Plus } from "Icons";
   import { ButtonWindow, ButtonTool } from "Common/Buttons";
-  import { newFileVisible, communityTabVisible, currentTab } from "../store";
+  import { newFileVisible, newProjectBtnEnabled, communityTabVisible, currentTab } from "../store";
   import { onClickHome, onClickNewProject, onClickCommunity } from "./utils";
 </script>
 
@@ -27,7 +27,7 @@
       <Community size="20" />
     </ButtonWindow>
   {/if}
-  {#if $newFileVisible}
+  {#if $newFileVisible && $newProjectBtnEnabled}
     <ButtonTool padding={"0px 8px"} on:buttonClick={onClickNewProject}>
       <Plus size="15" />
     </ButtonTool>

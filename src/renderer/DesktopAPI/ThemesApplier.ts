@@ -1,6 +1,6 @@
 import * as E from "electron";
 import { DEFAULT_THEME, SELECTORS_TO_IGNORE, PROPS_WITH_COLOR, CHROME_GPU } from "Const";
-import { getColorsMap, variablesColorsMap } from "Utils/Common";
+import { variablesColorsMap } from "Utils/Common";
 
 export class ThemesApplier {
   private currentTheme: Themes.Theme;
@@ -91,16 +91,14 @@ export class ThemesApplier {
       }
       if (key === "fg-overlay") {
         el.style.setProperty("--color-icon-menu", value);
+        el.style.setProperty("--fg-overlay", value);
+        el.style.setProperty("--fg-overlay-right", value);
       }
       if (key === "bg-toolbar-hover") {
         el.style.setProperty("--color-bg-toolbar-hover", value);
       }
       if (key === "fg-tab-hover") {
         el.style.setProperty("--color-text-toolbar-hover", value);
-      }
-      if (key === "fg-overlay") {
-        el.style.setProperty("--fg-overlay", value);
-        el.style.setProperty("--fg-overlay-right", value);
       }
       if (key === "fg-toolbar") {
         el.style.setProperty("--color-icon-toolbar", value);
@@ -162,7 +160,6 @@ export class ThemesApplier {
 
     el.style.setProperty("--color-bg", "var(--bg-panel)");
     el.style.setProperty("--color-bg-toolbar", "var(--bg-toolbar)");
-    el.style.setProperty("--color-bg-selected", "var(--bg-panel)");
     el.style.setProperty("--color-text", "var(--text)");
     el.style.setProperty("--color-text-secondary", "var(--text)");
     el.style.setProperty("--color-border", "var(--borders)");
@@ -185,7 +182,7 @@ export class ThemesApplier {
     const figmaCoreStylesheet = this.getCoreStylesheet();
     if (location.href.match(CHROME_GPU)) {
       const newStyles = document.createElement("style");
-      newStyles.innerText = "html { background-color: cadetblue; }";
+      newStyles.textContent = "html { background-color: cadetblue; }";
 
       document.head.appendChild(newStyles);
     }
@@ -194,7 +191,6 @@ export class ThemesApplier {
       return;
     }
 
-    const colorsMap = getColorsMap(this.currentTheme.palette);
     const additionStyleRules: string[] = [
       "#react-page { background-color: var(--bg-panel); }",
       `span[class*="action_option--shortcut"] { color: var(--fg-overlay); }`,
@@ -220,7 +216,7 @@ export class ThemesApplier {
           PROPS_WITH_COLOR.forEach((colorProp) => {
             const colorValue = cssRule.style[colorProp];
 
-            if (colorValue != "" && Object.prototype.hasOwnProperty.call(colorsMap, colorValue)) {
+            if (colorValue != "" && Object.hasOwn(variablesColorsMap, colorValue)) {
               cssRule.style[colorProp] = `${variablesColorsMap[colorValue]}`;
             }
           });
@@ -250,7 +246,7 @@ export class ThemesApplier {
           cssRule.style["fill"] = `var(--text-active)`;
         }
         if (
-          /new_file_creation_topbar--importIcon|close_button--closeX|new_file_creation_topbar--plusIcon|new_file_creation_topbar--importIcon|option_button--_optionButton|raw_components--_iconButton|object_row--layerIcon|segmented_control--icon/.test(
+          /new_file_creation_topbar--importIcon|close_button--closeX|new_file_creation_topbar--plusIcon|option_button--_optionButton|raw_components--_iconButton|object_row--layerIcon|segmented_control--icon/.test(
             cssRule.selectorText,
           )
         ) {
@@ -338,16 +334,16 @@ export class ThemesApplier {
             `${cssRule.selectorText}::-webkit-scrollbar-thumb { background: var(--color-scrollbar, rgba(179, 179, 179, 0.5)); border-radius: 10px; }`,
           );
         }
-        additionStyleRules.push(
-          `button[class*=css_builder--colorBgPressed] { color: var(--fg-toolbar-active); }`,
-        );
-        additionStyleRules.push(`input { color: var(--text-active); }`);
       }
     }
+    additionStyleRules.push(
+      `button[class*=css_builder--colorBgPressed] { color: var(--fg-toolbar-active); }`,
+    );
+    additionStyleRules.push(`input { color: var(--text-active); }`);
 
     if (additionStyleRules.length) {
       const newStyles = document.createElement("style");
-      newStyles.innerText = additionStyleRules.join("\n");
+      newStyles.textContent = additionStyleRules.join("\n");
 
       document.head.appendChild(newStyles);
     }

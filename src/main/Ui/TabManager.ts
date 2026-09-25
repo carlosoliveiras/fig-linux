@@ -6,15 +6,17 @@ import MainTab from "./MainTab";
 import CommunityTab from "./CommunityTab";
 import Tab from "./Tab";
 import { storage } from "Main/Storage";
+import { Listeners } from "Utils/Main";
 
 export default class TabManager {
   public mainTab: MainTab;
   public communityTab: CommunityTab | undefined;
-  public hasOpenedNewFileTab: boolean = false;
-  public hasOpenedCommunityTab: boolean = false;
+  public hasOpenedNewFileTab = false;
+  public hasOpenedCommunityTab = false;
 
   public lastFocusedTab: number | undefined;
   private tabs: Map<number, Tab> = new Map();
+  private listeners = new Listeners();
 
   public get mainTabWebContentId() {
     return this.mainTab.view.webContents.id;
@@ -102,45 +104,13 @@ export default class TabManager {
     return nextTabId;
   }
 
-  public reloadAll() {
-    this.tabs.forEach((t) =>
-      !t.view.webContents.isDestroyed() ? t.view.webContents.reload() : "",
-    );
-  }
   public updateScaleAll(scale: number) {
     this.mainTab.updateScale(scale);
     this.communityTab && this.communityTab.updateScale(scale);
     this.tabs.forEach((t) => t.updateScale(scale));
   }
 
-  public getTabByIndex(index: number) {
-    let i = 0;
-    let foundTab: Types.Tab | undefined;
 
-    this.tabs.forEach((tab) => {
-      if (index === i) {
-        foundTab = tab;
-      }
-
-      i++;
-    });
-
-    return foundTab;
-  }
-
-  public getTabIndex(webContentsId: number) {
-    let i = 0;
-
-    this.tabs.forEach((_, id) => {
-      if (webContentsId === id) {
-        return;
-      }
-
-      i++;
-    });
-
-    return i;
-  }
 
   public reloadTab(tabId: number) {
     const tab = this.getById(tabId);
@@ -175,7 +145,7 @@ export default class TabManager {
           return this.tabs.get(id);
         } else if (this.mainTab.id === id) {
           return this.mainTab;
-        } else if (this.communityTab.id === id) {
+        } else if (this.communityTab?.id === id) {
           return this.communityTab;
         }
       }
@@ -255,26 +225,12 @@ export default class TabManager {
     }
   }
 
-  public getTabUrl(tabId: number) {
-    const tab = this.tabs.get(tabId);
-
-    return tab.view.webContents.getURL();
-  }
 
   public isNewFileTab(tabId: number) {
     for (const [_, tab] of this.tabs) {
       if (tab.title && tab.title === NEW_FILE_TAB_TITLE && tab.id === tabId) {
         return true;
       }
-    }
-
-    return false;
-  }
-  public isMainTab(tabId: number) {
-    const keys = [...this.tabs.keys()];
-
-    if (keys[0] === tabId) {
-      return true;
     }
 
     return false;
@@ -304,9 +260,19 @@ export default class TabManager {
     storage.settings.theme.currentTheme = theme.id;
   }
 
-  private registerEvents() {
-    ipcMain.on("changeTheme", this.changeTheme.bind(this));
+  // Hidden tabs are detached from the window, so closing it doesn't end them.
+  public destroy() {
+    this.listeners.removeAll();
 
-    app.on("loadCurrentTheme", this.loadCurrentTheme.bind(this));
+    for (const tab of [this.mainTab, this.communityTab, ...this.tabs.values()]) {
+      if (tab && !tab.view.webContents.isDestroyed()) {
+        tab.view.webContents.close();
+      }
+    }
+  }
+
+  private registerEvents() {
+    this.listeners.on(ipcMain, "changeTheme", this.changeTheme.bind(this));
+    this.listeners.on(app, "loadCurrentTheme", this.loadCurrentTheme.bind(this));
   }
 }

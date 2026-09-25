@@ -8,12 +8,13 @@ import {
   panelZoom,
   newFileVisible,
   communityTabVisible,
+  newProjectBtnEnabled,
 } from "./store";
 
 export function initIpc() {
   ipcRenderer.send("frontReady");
 
-  ipcRenderer.on("closeAllTabs", () => {
+  ipcRenderer.on("closeAllTab", () => {
     tabs.set([]);
   });
   ipcRenderer.on("didTabAdd", (_, data) => {
@@ -65,6 +66,7 @@ export function initIpc() {
   });
   ipcRenderer.on("loadSettings", (_, settings: Types.SettingsInterface) => {
     panelZoom.set(settings.ui.scalePanel);
+    newProjectBtnEnabled.set(settings.app.visibleNewProjectBtn);
   });
   ipcRenderer.on("openCommunity", (_) => {
     communityTabVisible.set(true);

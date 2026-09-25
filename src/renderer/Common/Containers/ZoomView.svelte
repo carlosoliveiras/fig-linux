@@ -20,7 +20,7 @@
     if (
       div &&
       mask &&
-      (mask.isEqualNode(event.target as Node) || div.isEqualNode(event.target as Node))
+      (event.target === mask || event.target === div)
     ) {
       return true;
     }

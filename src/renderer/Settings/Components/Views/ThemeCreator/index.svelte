@@ -18,6 +18,12 @@
   import ColorPalette from "./ColorPalette.svelte";
   import Tutorial from "./Tutorial.svelte";
 
+  // Installed builds load this page from dist/ (file://), the dev build from the dev server.
+  const previewPreload =
+    location.protocol === "file:"
+      ? `file://${decodeURIComponent(new URL("./renderer/themePreviewPreload.js", location.href).pathname)}`
+      : `file://${resolve(process.cwd(), "dist/renderer", "themePreviewPreload.js")}`;
+
   export let zIndex: number;
 
   let zoomViewHeight: number;
@@ -39,8 +45,18 @@
 
   let webviews: any[] = [];
 
+  const sendTheme = (webview: any, store: typeof $creatorTheme) => {
+    webview.send("getThemeCreatorPalette", store.theme.palette);
+    webview.send("changeZoomFactor", store.zoom);
+  };
+
   onMount(() => {
-    webviews.forEach((webview, index) => {
+    // Previews whose page is loaded. One subscription feeds them all; it used to
+    // subscribe again on every dom-ready (each navigation of each preview) and
+    // never unsubscribe.
+    const ready = new Set<any>();
+
+    webviews.forEach((webview) => {
       webview.addEventListener("dom-ready", () => {
         if (previewer) {
           const width = previewer.getBoundingClientRect().width;
@@ -52,18 +68,13 @@
         }
 
         setTimeout(() => {
-          webview.send("getThemeCreatorPalette", $creatorTheme.theme.palette);
-
-          creatorTheme.subscribe((store) => {
-            if (webviews.length === 0 || !webviews[index]) {
-              return;
-            }
-            webview.send("getThemeCreatorPalette", store.theme.palette);
-            webview.send("changeZoomFactor", store.zoom);
-          });
+          ready.add(webview);
+          sendTheme(webview, $creatorTheme);
         }, 1000);
       });
     });
+
+    return creatorTheme.subscribe((store) => ready.forEach((webview) => sendTheme(webview, store)));
   });
 
   $: isValidName = $themeNameError === "";
@@ -121,16 +132,18 @@
               {/if}
             </ButtonTool>
           </toolBar>
-          <iframeView
-            style={`
-              ${getColorPallet($creatorTheme.theme).join(";")};
-              z-index: ${$settings.app.useOldPreviewer ? 2 : 0};
-              display: ${$settings.app.useOldPreviewer ? "block" : "none"};
-              user-select: ${$settings.app.useOldPreviewer ? "all" : "none"};
-            `}
-          >
-            <Preview />
-          </iframeView>
+          {#if $settings.app.useOldPreviewer}
+            <iframeView
+              style={`
+                ${getColorPallet($creatorTheme.theme).join(";")};
+                z-index: 2;
+                display: block;
+                user-select: all;
+              `}
+            >
+              <Preview />
+            </iframeView>
+          {/if}
           <iframeView
             bind:this={previewer}
             style={`
@@ -139,66 +152,19 @@
               user-select: ${$settings.app.useOldPreviewer ? "none" : "all"};
             `}
           >
-            <webview
-              bind:this={webviews[0]}
-              preload={`file://${resolve(
-                process.cwd(),
-                "dist/renderer",
-                "themePreviewPreload.js",
-              )}`}
-              style={`
-                  user-select: none;
-                  width: 1099px;
-                  height: 609px;
-                `}
-              title="Figma recent files"
-              src="https://www.figma.com/files/recent"
-            />
-            <webview
-              bind:this={webviews[1]}
-              preload={`file://${resolve(
-                process.cwd(),
-                "dist/renderer",
-                "themePreviewPreload.js",
-              )}`}
-              style={`
-                  user-select: none;
-                  width: 1099px;
-                  height: 609px;
-                `}
-              title="Figma recent files"
-              src="https://www.figma.com/files/recent"
-            />
-            <webview
-              bind:this={webviews[2]}
-              preload={`file://${resolve(
-                process.cwd(),
-                "dist/renderer",
-                "themePreviewPreload.js",
-              )}`}
-              style={`
-                  user-select: none;
-                  width: 1099px;
-                  height: 609px;
-                `}
-              title="Figma recent files"
-              src="https://www.figma.com/files/recent"
-            />
-            <webview
-              bind:this={webviews[3]}
-              preload={`file://${resolve(
-                process.cwd(),
-                "dist/renderer",
-                "themePreviewPreload.js",
-              )}`}
-              style={`
-                  user-select: none;
-                  width: 1099px;
-                  height: 609px;
-                `}
-              title="Figma recent files"
-              src="https://www.figma.com/files/recent"
-            />
+            {#each [0, 1, 2, 3] as i}
+              <webview
+                bind:this={webviews[i]}
+                preload={previewPreload}
+                style={`
+                    user-select: none;
+                    width: 1099px;
+                    height: 609px;
+                  `}
+                title="Figma recent files"
+                src="https://www.figma.com/files/recent"
+              />
+            {/each}
           </iframeView>
           <Tutorial slot="layout_1" />
         </ZoomView>

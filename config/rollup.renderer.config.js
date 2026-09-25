@@ -8,7 +8,6 @@ const alias = require("@rollup/plugin-alias");
 const terser = require("@rollup/plugin-terser");
 const sveltePreprocess = require("svelte-preprocess");
 const typescript = require("@rollup/plugin-typescript");
-const css = require("rollup-plugin-css-only");
 const copy = require("rollup-plugin-copy");
 const postcss = require("rollup-plugin-postcss");
 
@@ -47,10 +46,6 @@ const commonPlugins = [
         replacement: path.resolve(projectRootDir, "..", "src/renderer/Common"),
       },
       {
-        find: "Containers",
-        replacement: path.resolve(projectRootDir, "..", "src/renderer/Common/Containers"),
-      },
-      {
         find: "Icons",
         replacement: path.resolve(projectRootDir, "..", "src/renderer/Common/Icons"),
       },
@@ -69,9 +64,6 @@ const svelteFrontendPlugins = [
   }),
   postcss({
     extract: "base.css",
-  }),
-  css({
-    output: "bundle.css",
   }),
   resolve({
     browser: false,
@@ -193,10 +185,6 @@ module.exports = [
           },
           {
             src: "src/settings.html",
-            dest: "dist",
-          },
-          {
-            src: "src/themeCreator.html",
             dest: "dist",
           },
         ],

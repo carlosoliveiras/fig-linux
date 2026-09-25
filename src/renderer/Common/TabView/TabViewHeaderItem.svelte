@@ -24,7 +24,7 @@
     --width: ${width};
     --height: ${height};
     --padding: ${padding};
-    --border-radius: ${round};
+    --border-radius: ${round}px;
     --normal-fg-color: ${normalFgColor};
     --normal-bg-color: ${normalBgColor};
     --hover-fg-color: ${hoverFgColor};
