@@ -1,5 +1,7 @@
 # <img src="resources/icons/128x128.png" width="32"> fig-linux
 
+**English** | [Português (Brasil)](README.pt-BR.md)
+
 fig-linux is an unofficial [Electron](https://www.electronjs.org)-based [Figma](https://figma.com) desktop app for Linux.
 
 It is not affiliated with, endorsed or sponsored by Figma, Inc. "Figma" is a trademark of Figma, Inc.
@@ -10,30 +12,43 @@ It is not affiliated with, endorsed or sponsored by Figma, Inc. "Figma" is a tra
 
 ## Installation
 
-Packages (`.deb`, `.rpm`, `pacman`, AppImage and `.zip`) are published on the
-[Releases](https://github.com/carlosoliveiras/fig-linux/releases) page when available.
-Until then, build them from source as described below.
+Download the package for your distro from the
+[latest release](https://github.com/carlosoliveiras/fig-linux/releases/latest)
+(current version: **0.12.0**).
 
-### AppImage
-
-```bash
-chmod +x fig-linux-*.AppImage
-sudo ./fig-linux-*.AppImage -i
-```
-This installs fig-linux on your system, after which you can run it from a terminal or from your app list.
-Run `./fig-linux-*.AppImage -h` for more options.
+| Distro | File |
+|---|---|
+| Debian / Ubuntu | `fig-linux_<version>_linux_amd64.deb` |
+| Fedora / openSUSE | `fig-linux_<version>_linux_x86_64.rpm` |
+| Arch / Manjaro | `fig-linux_<version>_linux_x64.pacman` |
+| Any distro | `fig-linux_<version>_linux_x86_64.AppImage` or `fig-linux_<version>_linux_x64.zip` |
 
 ### Debian-based distros
 
 ```bash
-sudo apt install ./fig-linux_*_amd64.deb
+sudo apt install ./fig-linux_*_linux_amd64.deb
 ```
 
 ### RPM-based distros
 
 ```bash
-sudo dnf install ./fig-linux-*.x86_64.rpm
+sudo dnf install ./fig-linux_*_linux_x86_64.rpm
 ```
+
+### Arch-based distros
+
+```bash
+sudo pacman -U fig-linux_*_linux_x64.pacman
+```
+
+### AppImage
+
+```bash
+chmod +x fig-linux_*.AppImage
+sudo ./fig-linux_*.AppImage -i
+```
+This installs fig-linux on your system, after which you can run it from a terminal or from your app list.
+Run `./fig-linux_*.AppImage -h` for more options.
 
 ### Coming from figma-linux
 
