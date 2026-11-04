@@ -49,6 +49,9 @@
     "icon": "resources/icons",
     "category": "Graphics",
     "packageCategory": "Graphics",
+    "desktop": {
+      "Name": "Fig Linux"
+    },
     "maintainer": "Jos\u00e9 Carlos <vxcarlosig@gmail.com>",
     "artifactName": "${name}_${version}_${platform}_${arch}.${ext}",
     "fileAssociations": [
